@@ -30,7 +30,6 @@
       <button class="btn" onclick="send('#/intro')">Intro</button>
       <button class="btn" onclick="send('#/tri')">Tri Standings</button>
       <button class="btn" onclick="send('#/wc')">WC Standings</button>
-      <button class="btn" onclick="send('#/players')">Player Stats</button>
     </div>
     <div class="muted">Tip: Move the viewer to your program monitor and hit F11. If pop-ups are blocked, allow them for this site.</div>
   </div>
@@ -69,8 +68,7 @@ document.getElementById('open').addEventListener('click', ()=> openViewer());
 
 function send(route){
   if(!viewer || viewer.closed){
-    // first click or after close — open and jump straight to the route
-    openViewer(route);
+    openViewer(route); // open then land on the asked route
     return;
   }
   viewer.postMessage({type:'goto', route}, '*');
