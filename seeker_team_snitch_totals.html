@@ -38,38 +38,32 @@
   .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
   .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-  /* Top area – logo left, TEAM centered, spacer right (for true centering) */
+  /* Top bar with centered pill */
   .front .top{
-    display:grid; grid-template-columns:34px 1fr 34px;
-    align-items:center;
-    padding:12px 12px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    padding:10px 12px;border-bottom:1px solid var(--line);
     background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
   }
-  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover}
-  .title-stack{min-width:0; text-align:center;}
-  .team{color:var(--muted); font-size:12px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .team-pill{
+    color:var(--gold); font-weight:800; letter-spacing:.2px;
+    background:rgba(214,179,106,.08);
+    border:1px solid rgba(214,179,106,.35);
+    padding:6px 14px; border-radius:12px;
+    max-width:92%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow:inset 0 0 16px rgba(214,179,106,.08);
+  }
 
-  /* Center body with big team name */
+  /* Center big team logo */
   .body{
-    position:absolute; inset:44px 0 52px;
+    position:absolute; inset:48px 0 58px;
     display:grid; place-items:center;
     background:
-      radial-gradient(140px 70px at 50% 15%, rgba(212,175,55,.08), transparent 70%),
-      radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
+      radial-gradient(140px 70px at 50% 12%, rgba(212,175,55,.07), transparent 70%),
+      radial-gradient(180px 110px at 50% 105%, rgba(0,0,0,.35), transparent 70%);
   }
-  .team-big{
-    display:inline-block;
-    padding:10px 18px;
-    border-radius:10px;
-    background:rgba(0,0,0,.35);
-    font-weight:900;
-    font-size: clamp(20px, 3.8vw, 36px);
-    line-height:1.05;
-    letter-spacing:.2px;
-    color:#fff;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    box-shadow: 0 0 0 1px rgba(212,175,55,.15) inset,
-                0 6px 16px rgba(0,0,0,.35);
+  .team-logo-big{
+    width:72%; max-width:220px; height:auto; object-fit:contain;
+    filter: drop-shadow(0 6px 24px rgba(0,0,0,.35));
   }
 
   /* Bottom total bar */
@@ -101,7 +95,7 @@
     <button class="btn" id="hideAll">Hide All</button>
   </div>
   <div class="grid" id="grid"></div>
-  <div class="hint">Logo missing? Check your <code>assets/</code> filenames or tweak <code>LOGO_MAP</code>.</div>
+  <div class="hint">Logo missing? Check <code>assets/</code> filenames or tweak <code>LOGO_MAP</code>.</div>
 </div>
 
 <script>
@@ -113,12 +107,12 @@
     HOG:'hellfire_hogs.png',
     OWL:'oakshaft_owls.png',
     OP:'the_order_of_the_phoenoobz.png',
-    CC:'crazy_comms.png',                 // displayed text becomes “Wholesome Comms”
+    CC:'crazy_comms.png',                 // shows as Wholesome Comms
     TI:'thin_ice.png',
     DQC:'dumbledorks_quidditch_club.png',
     BD:'bad_dwagons.png',
     NHK:'nimbus_nighthawks.png',
-    NN:'nimbus_nighthawks.png',          // alias used in your data
+    NN:'nimbus_nighthawks.png',
     BNG:'azkabangers.png',
     OBS:'obscurus_quidditch_club.png',
     MISSING:'missing_logo.png'
@@ -128,7 +122,6 @@
   /* Friendly display names */
   function teamDisplay(tagOrName){
     const s = String(tagOrName || '').trim();
-    // Tags to full names
     const tagMap = {
       CC:'Wholesome Comms',
       DQC:'Dumbledorks Q.C.',
@@ -140,15 +133,13 @@
       NN:'Nimbus Nighthawks'
     };
     if (tagMap[s]) return tagMap[s];
-
-    // Fallback for full names passed in
     if (/^Crazy Comms$/i.test(s)) return 'Wholesome Comms';
     if (/^Dumbledorks Quidditch Club$/i.test(s)) return 'Dumbledorks Q.C.';
     if (/^Obscurus Quidditch Club$/i.test(s)) return 'Obscurus Q.C.';
     return s;
   }
 
-  /* Data (order preserved as provided) */
+  /* Data */
   const DATA = [
     { teamTag:'CC',  total:22 },
     { teamTag:'DQC', total:17 },
@@ -165,20 +156,17 @@
     const wrap = document.createElement('div');
     wrap.className = 'card';
     const niceTeam = teamDisplay(row.teamTag);
+
     wrap.innerHTML = `
       <div class="flip">
         <div class="face back"><img alt="L7 logo" src="assets/L7_logo_small.png"></div>
         <div class="face front">
           <div class="top">
-            <img class="team-logo" alt="${row.teamTag}">
-            <div class="title-stack">
-              <div class="team" title="${niceTeam}">${niceTeam}</div>
-            </div>
-            <div></div>
+            <div class="team-pill" title="${niceTeam}">${niceTeam}</div>
           </div>
 
           <div class="body">
-            <div class="team-big" title="${niceTeam}">${niceTeam}</div>
+            <img class="team-logo-big" alt="${row.teamTag}">
           </div>
 
           <div class="bottom">
@@ -187,7 +175,8 @@
           </div>
         </div>
       </div>`;
-    wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
+
+    wrap.querySelector('.team-logo-big').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
     return wrap;
   }
@@ -202,4 +191,3 @@
 </script>
 </body>
 </html>
-
