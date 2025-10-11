@@ -1,78 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Quaffle Report • Control</title>
+<title>Quaffle Report • Viewer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0c0c0e;--panel:#111;--line:#2a2a2a;--gold:#d6b36a;--text:#f1f1f1;--muted:#bdbdbd}
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:920px;margin:0 auto;padding:14px}
-  h1{font-size:18px;margin:0 0 8px}
-  .row{display:flex;gap:8px;flex-wrap:wrap}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
-  .btn{padding:8px 10px;border:1px solid #333;background:#191919;border-radius:10px;color:var(--text);cursor:pointer}
-  .btn.gold{background:rgba(214,179,106,.08);border-color:rgba(214,179,106,.45)}
-  .btn:active{transform:translateY(1px)}
-  .muted{color:var(--muted);font-size:12px}
-  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-  @media (max-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+  :root{
+    --bg:#0b0b0c; --panel:#101010; --text:#f1f1f1; --muted:#bdbdbd;
+    --gold:#d6b36a; --line:rgba(214,179,106,.25);
+    --row:rgba(214,179,106,.06); --row2:rgba(255,255,255,.03);
+    --shadow:0 18px 58px rgba(0,0,0,.55); --r:16px;
+  }
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0}
+  .wrap{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+  header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.25))}
+  header .crumb{font-size:12px;color:var(--muted)}
+  .stage{padding:20px}
+  .card{max-width:1360px;margin:0 auto;background:linear-gradient(180deg,#111,#0c0c0c);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+  h1,h2,h3,h4{margin:0 0 10px}
+  .center{display:grid;place-items:center;text-align:center}
+  .hero{min-height:calc(100vh - 90px);position:relative;overflow:hidden}
+  .hero-inner{display:grid;place-items:center;height:100%}
+  .qr{width:min(36vw,440px);height:auto;opacity:0;transform:scale(.94);
+      filter:drop-shadow(0 12px 40px rgba(214,179,106,.22));
+      transition:opacity .6s ease,transform .8s cubic-bezier(.2,.9,.2,1)}
+  .qr.on{opacity:1;transform:scale(1);animation:pulse 2.1s ease-in-out .6s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+  .hero h1{font-size:clamp(28px,4vw,54px);font-weight:800;margin-top:22px}
+  .sub{opacity:.85}
+  .pill{position:absolute;left:50%;transform:translateX(-50%);bottom:20px;font-size:12px;padding:6px 12px;border:1px solid rgba(214,179,106,.35);border-radius:999px;background:rgba(214,179,106,.06)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{padding:12px 14px;text-align:left;color:var(--muted);border-bottom:1px solid var(--line)}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--row2)}
+  tbody tr:nth-child(odd){background:var(--row2)} tbody tr:hover{background:var(--row)}
+  .teamcell{display:flex;align-items:center;gap:10px}
+  .logo{height:28px;width:28px;border-radius:10px}
+  .team-header{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;align-items:center}
+  .t-left{display:flex;gap:12px;align-items:center}
+  .t-left img{height:92px;width:92px;border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+  .t-mid{text-align:center} .t-mid h3{font-size:34px;font-weight:800}
+  .t-right{text-align:right}
+  .grid-3{display:grid;grid-template-columns:300px 1fr 320px;gap:16px;margin-top:12px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+  .panel h4{margin-bottom:8px}
+  .roster ul{list-style:none;margin:0;padding:0;columns:2;column-gap:14px}
+  .roster li{padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+  @media (max-width:1100px){.team-header{grid-template-columns:160px 1fr 1fr}.grid-3{grid-template-columns:1fr}.roster ul{columns:1}}
+  .hint{font-size:12px;color:var(--muted)}
+  .reveal{user-select:none;border:1px dashed var(--line);padding:12px;border-radius:10px;cursor:pointer;background:rgba(255,255,255,.02)}
+  .reveal.open{border-style:solid;background:rgba(214,179,106,.06)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <h1>Quaffle Report • Control</h1>
-    <div class="row">
-      <button class="btn gold" id="open">Open Viewer</button>
-      <button class="btn" onclick="send('#/title')">Title</button>
-      <button class="btn" onclick="send('#/intro')">Intro</button>
-      <button class="btn" onclick="send('#/tri')">Tri Standings</button>
-      <button class="btn" onclick="send('#/wc')">WC Standings</button>
-      <button class="btn" onclick="send('#/players')">Player Stats</button>
-    </div>
-    <div class="muted">Tip: After opening the viewer, move it to your program monitor and hit F11. Use these buttons for “pull” screens.</div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin:0 0 10px">Triwizard Teams</h3>
-    <div class="grid">
-      <button class="btn" onclick="send('#/team/HOG')">HOG</button>
-      <button class="btn" onclick="send('#/team/RVN')">RVN</button>
-      <button class="btn" onclick="send('#/team/OWL')">OWL</button>
-      <button class="btn" onclick="send('#/team/OP')">OP</button>
-      <button class="btn" onclick="send('#/team/HAG')">HAG</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin:0 0 10px">World Cup Teams</h3>
-    <div class="grid">
-      <button class="btn" onclick="send('#/team/BNG')">BNG</button>
-      <button class="btn" onclick="send('#/team/BD')">BD</button>
-      <button class="btn" onclick="send('#/team/CC')">CC</button>
-      <button class="btn" onclick="send('#/team/DQC')">DQC</button>
-      <button class="btn" onclick="send('#/team/NHK')">NHK</button>
-      <button class="btn" onclick="send('#/team/OBS')">OBS</button>
-      <button class="btn" onclick="send('#/team/TI')">TI</button>
-    </div>
-  </div>
+  <header>
+    <div class="crumb" id="crumb">Quaffle Report • Viewer</div>
+    <div class="hint">F11 for full-screen • ← / → to cycle</div>
+  </header>
+  <div class="stage" id="stage"></div>
 </div>
 
 <script>
-let viewer = null;
-document.getElementById('open').addEventListener('click', ()=>{
-  viewer = window.open('viewer.html#%2Ftitle','qr_viewer','noopener,width=1280,height=720');
-});
-function send(route){
-  if(!viewer || viewer.closed){
-    viewer = window.open('viewer.html'+route,'qr_viewer','noopener,width=1280,height=720');
+/* ===== Path + image helpers (uses /assets) ===== */
+const LOGO_BASE = 'assets/';
+const LOGO_MAP = {
+  RVN:'knockturn_ravens.png', HAG:'wildcard_hagrids.png', HOG:'hellfire_hogs.png',
+  OWL:'oakshaft_owls.png', OP:'obscurus_quidditch_club.png' /* fallback for OP if no custom */,
+  OPX:'the_order_of_the_phoenoobz.png', /* try this first for OP */
+  CC:'crazy_comms.png', TI:'thin_ice.png', DQC:'dumbledorks_quidditch_club.png',
+  BD:'bad_dwagons.png', NHK:'nimbus_nighthawks.png', BNG:'azkabangers.png', OBS:'obscurus_quidditch_club.png'
+};
+function imgWithFallback(el, paths){ let i=0; const next=()=>{ if(i>=paths.length) return; el.onerror=()=>{i++;next()}; el.src=paths[i++] }; next(); }
+function teamLogoPaths(tag){
+  const fname = (tag==='OP' ? (LOGO_MAP['OPX'] || LOGO_MAP['OP']) : LOGO_MAP[tag]) || 'missing_logo.png';
+  return [LOGO_BASE+fname, LOGO_BASE+'missing_logo.png'];
+}
+
+/* ===== Standings (Season 3) ===== */
+const TRI = {
+  table: [
+    ['RVN','Knockturn Ravens',3,6,'66.7%',650,460,4,9],
+    ['HAG','Wildcard Hagrids',3,6,'66.7%',640,570,4,9],
+    ['HOG','Hellfire Hogs',2,6,'60.0%',710,610,4,10],
+    ['OWL','Oakshaft Owls',2,5,'50.0%',730,730,4,10],
+    ['OP','The Order of the Phoenoobz',0,0,'0.0%',300,660,4,8],
+  ],
+  h2h: [
+    ['Hellfire Hogs','—','0-2','1-2','2-0','1-2'],
+    ['Knockturn Ravens','2-0','—','2-1','2-0','2-0'],
+    ['Oakshaft Owls','2-1','1-2','—','2-0','0-2'],
+    ['The Order of the Phoenoobz','0-2','0-2','0-2','—','0-2'],
+    ['Wildcard Hagrids','2-1','0-2','2-0','2-0','—'],
+  ],
+  cols: ['Hellfire Hogs','Knockturn Ravens','Oakshaft Owls','The Order of the Phoenoobz','Wildcard Hagrids']
+};
+
+const WC = {
+  table: [
+    ['CC','Crazy Comms',6,12,'85.7%',1110,420,6,14],
+    ['BNG','Azkabangers',5,10,'71.4%',1040,720,6,14],
+    ['DQC','Dumbledorks Quidditch Club',4,10,'58.8%',1010,930,6,17],
+    ['TI','Thin Ice',3,9,'60.0%',1060,790,6,15],
+    ['BD','Bad Dwagons',2,5,'35.7%',710,840,6,14],
+    ['OBS','Obscurus Quidditch Club',1,3,'23.1%',400,970,6,13],
+    ['NHK','Nimbus Nighthawks',0,1,'7.7%',450,1110,6,13],
+  ],
+  cols: ['Azkabangers','Bad Dwagons','Crazy Comms','Dumbledorks Quidditch Club','Nimbus Nighthawks','Obscurus Quidditch Club','Thin Ice'],
+  h2h: [
+    ['Azkabangers','—','2-0','0-2','2-1','2-0','2-0','2-1'],
+    ['Bad Dwagons','0-2','—','0-2','1-2','2-1','2-0','0-2'],
+    ['Crazy Comms','2-0','2-0','—','2-1','2-0','2-0','2-1'],
+    ['Dumbledorks Quidditch Club','1-2','2-1','1-2','—','2-0','2-1','2-1'],
+    ['Nimbus Nighthawks','0-2','1-2','0-2','0-2','—','0-2','0-2'],
+    ['Obscurus Quidditch Club','0-2','0-2','0-2','1-2','2-0','—','0-2'],
+    ['Thin Ice','1-2','2-0','1-2','1-2','2-0','2-0','—'],
+  ]
+};
+
+/* ===== Rosters & captains (Season 3) ===== */
+const TEAMS = {
+  // Triwizard
+  HOG:{name:'Hellfire Hogs', cap:'Moonech', co:'CraftyCat9',
+    roster:['Moonech','CraftyCat9','Tamaquashad','Udomorn','Sweeping-flower3','NamesVALOR','RitchieCootes','luketurner','xOofPSN'],
+    mb:[['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','1-2']],
+    note:'Founder Melanore’s league; Hogs captain is Moonech.'
+  },
+  RVN:{name:'Knockturn Ravens', cap:'DBRiley', co:'Pwatt86',
+    roster:['DBRiley','timetwister2122','Kuragamie','PWatt86','Malikosis','ATelemarketer','DKaas','chaoscreature29','ItsLuna','Hawkeye'],
+    mb:[['vs Hellfire Hogs','2-0'],['vs Oakshaft Owls','2-1'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','2-0']],
+    note:'#1 seed. Riley passing armband to Pwatt due to injury.'
+  },
+  OWL:{name:'Oakshaft Owls', cap:'OlympusMew', co:'—',
+    roster:['OlympusMew','Tantrum1x','FM','Darkshadowfox91','FasterEddy135','Stormywhether','ItsSayruh','Chemicool516','Potology'],
+    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','0-2']],
+    note:'No co-captain listed.'
+  },
+  OP:{name:'The Order of the Phoenoobz', cap:'Cleet716', co:'Warbeard',
+    roster:['Cleet716','WARB E4RD','OiledupDaddyHog','MegWood','CrazyChiika','NKatie22','Silverlimb7182','RealityOverload','Emera1d0wl','DoubleM_M46'],
+    mb:[['vs Hellfire Hogs','0-2'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','0-2'],['vs Wildcard Hagrids','0-2']],
+    note:'Hunting first series win.'
+  },
+  HAG:{name:'Wildcard Hagrids', cap:'Melanore', co:'—',
+    roster:['Melanore','PS1HagridBot','LosBobs','shinobert','DandBang','Gavgum','SittingDuck2121','Banzo','KDtox','Clairefetti'],
+    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','2-0'],['vs The Order of the Phoenoobz','2-0']],
+    note:'First season competing for the league’s founder.'
+  },
+  // World Cup
+  CC:{name:'Crazy Comms', cap:'Lihsir', co:'—',
+    roster:['Lihsir','tuonela','makoonQC','Prophecy','carddi','Winford','ShonyQC','AlphaTux','RealCyprisTTV'],
+    mb:[['vs Azkabangers','2-0'],['vs Bad Dwagons','2-0'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs Thin Ice','2-1']],
+    note:'Brief WHC rename; reverted to Crazy Comms.'
+  },
+  BNG:{name:'Azkabangers', cap:'JimTones', co:'—',
+    roster:['JimTones','tediready','Aeriberry','DakeBlubey','AeriberrysWife','Glas','WINneo','UrBoiSkinnyHP','TRobbo11'],
+    mb:[['vs CC','0-2'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs TI','2-1'],['vs BD','2-0']],
+    note:'—'
+  },
+  DQC:{name:'Dumbledorks Quidditch Club', cap:'TheOTPHJ', co:'Grooby',
+    roster:['TheOTPHJ','skipper13','Compugamer11','SaffronJolly','tee-dreamz','DYNAMITECOP3','1Worden','JayGuard','Chadismydad42','GroobyGames'],
+    mb:[['vs BNG','1-2'],['vs BD','2-1'],['vs CC','1-2'],['vs NHK','2-0'],['vs OBS','2-1'],['vs TI','2-1']],
+    note:'—'
+  },
+  TI:{name:'Thin Ice', cap:'Flyrish', co:'—',
+    roster:['Flyrish','YukioTakeda','Banthanor','Pasawen','JMauler','Dementor','Denji','Chintasu','LinaRKH'],
+    mb:[['vs BD','2-0'],['vs CC','1-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs OBS','2-0'],['vs BNG','1-2']],
+    note:'—'
+  },
+  BD:{name:'Bad Dwagons', cap:'Pingu', co:'LukisusLT',
+    roster:['pingu','Beesman93','singularityyii','LukisusLT','livvygrace03','AshesOfAmber','Angel','YesImShade','VikRe'],
+    mb:[['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-1'],['vs OBS','2-0'],['vs TI','0-2'],['vs BNG','0-2']],
+    note:'Shade stepped down; Pingu takes over.'
+  },
+  OBS:{name:'Obscurus Quidditch Club', cap:'USAQuidditch', co:'—',
+    roster:['USAQuidditch','Odarina','LifeSizeMidget','Zaiyuni','Blackrose243','Edirani','GreenBlackCat','legoo777','Zac.creatives'],
+    mb:[['vs BNG','0-2'],['vs BD','0-2'],['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs TI','0-2']],
+    note:'Heavy roster churn mid-season.'
+  },
+  NHK:{name:'Nimbus Nighthawks', cap:'MichyMo', co:'—',
+    roster:['MichyMo','CheeZeNQueso','DackJaniels','DiskJockii','DarkRitNighthawk','Cowboy_Jackman','CptCarnage','Itz_Harry447','VibinWithVin'],
+    mb:[['vs CC','0-2'],['vs DQC','0-2'],['vs TI','0-2'],['vs BNG','0-2'],['vs BD','1-2'],['vs OBS','0-2']],
+    note:'Aewdoido out; Cowboy_Jackman in.'
+  },
+};
+
+/* ===== Routes in show order ===== */
+const ROUTES = [
+  '#/title', '#/intro',
+  '#/tri', '#/team/HOG', '#/team/RVN', '#/team/OWL', '#/team/OP', '#/team/HAG',
+  '#/wc', '#/team/BNG', '#/team/BD', '#/team/CC', '#/team/DQC', '#/team/NHK', '#/team/OBS', '#/team/TI',
+  '#/players'
+];
+
+/* ===== Renderers ===== */
+const stage = document.getElementById('stage');
+const crumb = document.getElementById('crumb');
+
+function render(route){
+  stage.innerHTML = '';
+  const parts = route.split('/');
+  const type = parts[1];
+  const arg  = parts[2];
+  crumb.textContent = `Quaffle Report • ${route.replace('#/','')}`;
+
+  if(type==='title'){
+    const wrap = document.createElement('div'); wrap.className='card hero';
+    const inner = document.createElement('div'); inner.className='hero-inner';
+    const img = document.createElement('img'); img.alt='Quaffle Report'; img.className='qr';
+    img.onload=()=>img.classList.add('on');
+    imgWithFallback(img, [
+      'assets/quaffle_report.png','assets/quaffle_report.webp'
+    ]);
+    inner.append(img);
+    const h1=document.createElement('h1'); h1.textContent='Season 3 • O.W.L.s Recap';
+    const sub=document.createElement('div'); sub.className='sub'; sub.textContent='Triwizard & World Cup Standings • Captains • Team Spotlight';
+    inner.append(h1,sub);
+    wrap.append(inner);
+    const pill=document.createElement('div'); pill.className='pill'; pill.textContent='Presented by League 7 — Press → to begin';
+    wrap.append(pill);
+    stage.append(wrap); return;
+  }
+
+  if(type==='intro'){
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML = `
+      <h3 style="font-size:28px;margin-bottom:10px">Tonight’s Broadcast</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="panel"><h4>Hosts</h4><div>Hosted by <b>Riley</b></div><div>Co-Hosted by <b>N E O</b> & <b>Winford</b></div></div>
+        <div class="panel"><h4>Analyst</h4><div>World Cup Stats by <b>OTPHJ</b></div></div>
+        <div class="panel"><h4>On-Field Leadership</h4><div>Captains: <b>MichyMo</b>, <b>Flyrish</b></div><div>Co-Captain: <b>Grooby</b></div></div>
+        <div class="panel"><h4>Production</h4><div>Produced by <b>Timetwister</b></div></div>
+      </div>`;
+    stage.append(card); return;
+  }
+
+  if(type==='tri' || type==='wc'){
+    const spec = (type==='tri') ? TRI : WC;
+    const title = (type==='tri') ? 'Triwizard Cup Division — Team Statistics' : 'World Cup Division — Team Statistics';
+    const card=document.createElement('div'); card.className='card';
+    const h=document.createElement('h4'); h.textContent=title; card.append(h);
+    const tbl=document.createElement('table');
+    tbl.innerHTML = `<thead><tr>
+      <th style="width:360px">Team</th><th>MW</th><th>GW</th><th>GWR</th><th>PS</th><th>PC</th><th>#M</th><th>#G</th>
+    </tr></thead><tbody></tbody>`;
+    const tb=tbl.querySelector('tbody');
+    spec.table.forEach(([tag,name,mw,gw,gwr,ps,pc,m,g])=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td class="teamcell"><img class="logo" alt=""><span>${name}</span></td>
+        <td>${mw}</td><td>${gw}</td><td>${gwr}</td><td>${ps}</td><td>${pc}</td><td>${m}</td><td>${g}</td>`;
+      const img=tr.querySelector('img'); imgWithFallback(img, teamLogoPaths(tag));
+      tb.append(tr);
+    });
+    card.append(tbl);
+
+    const h2=document.createElement('h4'); h2.style.marginTop='20px';
+    h2.textContent = (type==='tri') ? 'Triwizard — Team vs. Team' : 'World Cup — Team vs. Team';
+    card.append(h2);
+
+    const tbl2=document.createElement('table');
+    const headCols = spec.cols.map(c=>`<th>${c}</th>`).join('');
+    tbl2.innerHTML = `<thead><tr><th>Team vs. Team</th>${headCols}</tr></thead><tbody></tbody>`;
+    const tb2=tbl2.querySelector('tbody');
+    spec.h2h.forEach(row=>{
+      const [label,...vals]=row;
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td>${label}</td>${vals.map(v=>`<td>${v}</td>`).join('')}`;
+      tb2.append(tr);
+    });
+    card.append(tbl2);
+    stage.append(card); return;
+  }
+
+  if(type==='team' && arg && TEAMS[arg]){
+    const T = TEAMS[arg];
+    const big=document.createElement('div'); big.className='card';
+    big.innerHTML = `
+      <div class="team-header">
+        <div class="t-left"><img id="tlogo" alt=""><div></div></div>
+        <div class="t-mid"><h3>${T.name}</h3></div>
+        <div class="t-right">
+          <div><b>Capt:</b> ${T.cap}</div>
+          <div><b>Co-Cap:</b> ${T.co}</div>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="panel roster"><h4>Roster</h4><ul>${T.roster.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+        <div class="panel"><h4>Match Breakdown</h4>
+          <table><tbody>${T.mb.map(([opp,res])=>`<tr><td>${opp}</td><td>${res}</td></tr>`).join('')}</tbody></table>
+        </div>
+        <div class="panel">
+          <h4>Notes</h4><div>${T.note||'—'}</div>
+        </div>
+      </div>`;
+    stage.append(big);
+    const logo = big.querySelector('#tlogo'); imgWithFallback(logo, teamLogoPaths(arg));
     return;
   }
-  viewer.postMessage({type:'goto', route}, '*');
+
+  if(type==='players'){
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML = `
+      <h3 style="font-size:28px;margin-bottom:10px">Player Stats — OTPHJ Segment</h3>
+      <div id="pwrap" class="panel">Loading player stats (looking for <code>assets/players.json</code>)…</div>`;
+    stage.append(card);
+    // Try to load optional JSON if hosted (GitHub Pages). If not found, fall back.
+    fetch('assets/players.json', {cache:'no-store'}).then(r=>{
+      if(!r.ok) throw new Error('missing');
+      return r.json();
+    }).then(data=>{
+      const el = document.getElementById('pwrap');
+      if(!Array.isArray(data) || !data.length){ el.textContent='No player stats in file.'; return; }
+      const rows = data.slice(0,30).map(p=>`<tr><td>${p.player}</td><td>${p.team||''}</td><td>${p.metric1||''}</td><td>${p.metric2||''}</td></tr>`).join('');
+      el.innerHTML = `<table><thead><tr><th>Player</th><th>Team</th><th>Stat 1</th><th>Stat 2</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }).catch(()=>{
+      const el = document.getElementById('pwrap');
+      el.innerHTML = `<div class="reveal" id="reveal">No <code>assets/players.json</code> found. Click to show placeholder.</div>
+      <div id="ph" style="display:none;margin-top:10px">Placeholder — wire OTPHJ’s export here.</div>`;
+      const r = document.getElementById('reveal'); const ph=document.getElementById('ph');
+      r.addEventListener('click',()=>{ r.classList.toggle('open'); ph.style.display = ph.style.display==='none' ? 'block' : 'none'; });
+    });
+    return;
+  }
+
+  const msg=document.createElement('div'); msg.className='card center'; msg.style.minHeight='40vh';
+  msg.innerHTML = `<div>Unknown route: <code>${route}</code></div>`;
+  stage.append(msg);
 }
+
+/* ===== Navigation + control bridge ===== */
+function setRoute(r){ location.hash=r; render(r) }
+window.addEventListener('hashchange', ()=> render(location.hash||ROUTES[0]));
+document.addEventListener('keydown', e=>{
+  const i = ROUTES.indexOf(location.hash||ROUTES[0]);
+  if(e.key==='ArrowRight') setRoute(ROUTES[Math.min(i+1, ROUTES.length-1)]);
+  if(e.key==='ArrowLeft')  setRoute(ROUTES[Math.max(i-1, 0)]);
+});
+window.addEventListener('message', ev=>{
+  if(ev.data?.type==='goto' && typeof ev.data.route==='string'){ setRoute(ev.data.route) }
+});
+
+/* boot */
+if(!location.hash) location.hash = ROUTES[0];
+render(location.hash);
 </script>
 </body>
 </html>
-
