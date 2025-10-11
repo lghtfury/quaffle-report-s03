@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quaffle Report S03 - Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0c; --panel:#101010; --text:#f2f2f2; --muted:#bdbdbd;
+    --gold:#d6b36a; --line:rgba(214,179,106,.28);
+    --card:#111213; --cardHover:#151618;
+  }
+  html,body{height:100%;margin:0;background:radial-gradient(1200px 520px at 50% -10%, rgba(214,179,106,.08), transparent 65%), var(--bg); color:var(--text); font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.25))}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:40px;filter:drop-shadow(0 6px 20px rgba(214,179,106,.25))}
+  h1{font-size:clamp(20px,3.2vw,32px);margin:0}
+  .sub{color:var(--muted); font-size:13px}
+
+  .wrap{max-width:1200px;margin:26px auto;padding:0 16px}
+
+  .section{margin:18px 0 8px; display:flex;align-items:center;gap:10px}
+  .section h2{margin:0;font-size:16px;font-weight:800;letter-spacing:.3px}
+  .section .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  .grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  @media (max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:780px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}}
+
+  a.card{
+    display:flex; flex-direction:column; gap:6px;
+    padding:16px 14px; border:1px solid var(--line); border-radius:14px;
+    background:var(--card); text-decoration:none; color:var(--text);
+    transition:transform .12s ease, background .12s ease, border-color .12s ease;
+    box-shadow:0 12px 36px rgba(0,0,0,.35);
+  }
+  a.card:hover{ transform:translateY(-2px); background:var(--cardHover); border-color:rgba(214,179,106,.45) }
+  .card .kicker{font-size:12px; color:var(--muted); letter-spacing:.3px; text-transform:uppercase}
+  .card .title{font-size:16px; font-weight:800}
+  .card .hint{font-size:12px; color:var(--muted)}
+  .top-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
+  .callout{border:1px dashed var(--line); border-radius:12px; padding:10px 12px; color:var(--muted); font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="assets/L7_logo_small.png" alt="L7">
+    <div>
+      <h1>Quaffle Report S03 - Quick Links</h1>
+      <div class="sub">Everything one click away for stream control and stat screens</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- Control & Viewer -->
+  <div class="section"><h2>Live Control</h2><div class="rule"></div></div>
+  <div class="top-grid">
+    <a class="card" href="control.html" target="_blank" rel="noopener">
+      <div class="kicker">Controller</div>
+      <div class="title">Control Panel</div>
+      <div class="hint">Switch slides and push updates</div>
+    </a>
+    <a class="card" href="viewer.html" target="_blank" rel="noopener">
+      <div class="kicker">Output</div>
+      <div class="title">Viewer</div>
+      <div class="hint">Drop into OBS as a Browser Source</div>
+    </a>
+  </div>
+
+  <!-- Seeker -->
+  <div class="section"><h2>Seeker</h2><div class="rule"></div></div>
+  <div class="grid">
+    <a class="card" href="seeker_total_snitches.html" target="_blank" rel="noopener">
+      <div class="kicker">Seeker</div>
+      <div class="title">Total Snitches Caught</div>
+      <div class="hint">Flip cards for reveal</div>
+    </a>
+    <a class="card" href="seeker_team_snitch_totals.html" target="_blank" rel="noopener">
+      <div class="kicker">Seeker</div>
+      <div class="title">Team Snitch Totals</div>
+      <div class="hint">Team-level snitch counts</div>
+    </a>
+  </div>
+
+  <!-- Beater -->
+  <div class="section"><h2>Beater</h2><div class="rule"></div></div>
+  <div class="grid">
+    <a class="card" href="beater_seeker_elims.html" target="_blank" rel="noopener">
+      <div class="kicker">Beater</div>
+      <div class="title">Seeker Eliminations</div>
+      <div class="hint">Beaters vs Seekers</div>
+    </a>
+    <a class="card" href="beater_total_elims.html" target="_blank" rel="noopener">
+      <div class="kicker">Beater</div>
+      <div class="title">Total Eliminations</div>
+      <div class="hint">Aggregate per player</div>
+    </a>
+    <a class="card" href="beater_team_total_elims.html" target="_blank" rel="noopener">
+      <div class="kicker">Beater</div>
+      <div class="title">Team Total Eliminations</div>
+      <div class="hint">Rolled up per team</div>
+    </a>
+  </div>
+
+  <!-- Keeper -->
+  <div class="section"><h2>Keeper</h2><div class="rule"></div></div>
+  <div class="grid">
+    <a class="card" href="keeper_saves.html" target="_blank" rel="noopener">
+      <div class="kicker">Keeper</div>
+      <div class="title">Saves (saves + steals + intercepts)</div>
+      <div class="hint">Totals per player</div>
+    </a>
+    <a class="card" href="keeper_seeker_elims.html" target="_blank" rel="noopener">
+      <div class="kicker">Keeper</div>
+      <div class="title">Seeker Eliminations</div>
+      <div class="hint">Keepers vs Seekers</div>
+    </a>
+  </div>
+
+  <!-- Chaser -->
+  <div class="section"><h2>Chaser</h2><div class="rule"></div></div>
+  <div class="grid">
+    <a class="card" href="chaser_goals.html" target="_blank" rel="noopener">
+      <div class="kicker">Chaser</div>
+      <div class="title">Goals</div>
+      <div class="hint">Top scorers</div>
+    </a>
+    <a class="card" href="chaser_stops.html" target="_blank" rel="noopener">
+      <div class="kicker">Chaser</div>
+      <div class="title">Stops (steals + saves + interceptions)</div>
+      <div class="hint">Defensive contributions</div>
+    </a>
+    <a class="card" href="chaser_team_points.html" target="_blank" rel="noopener">
+      <div class="kicker">Chaser</div>
+      <div class="title">Team Points Scored</div>
+      <div class="hint">Team totals from chasers</div>
+    </a>
+  </div>
+
+  <div class="callout">Tip: Host this repo on GitHub Pages to share a single link. Settings → Pages → Deploy from branch → main → root.</div>
+</div>
+</body>
+</html>
