@@ -1,1 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quaffle Report • Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0c0c0e;--panel:#111;--line:#2a2a2a;--gold:#d6b36a;--text:#f1f1f1;--muted:#bdbdbd}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:920px;margin:0 auto;padding:14px}
+  h1{font-size:18px;margin:0 0 8px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+  .btn{padding:8px 10px;border:1px solid #333;background:#191919;border-radius:10px;color:var(--text);cursor:pointer}
+  .btn.gold{background:rgba(214,179,106,.08);border-color:rgba(214,179,106,.45)}
+  .btn:active{transform:translateY(1px)}
+  .muted{color:var(--muted);font-size:12px}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  @media (max-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Quaffle Report • Control</h1>
+    <div class="row">
+      <button class="btn gold" id="open">Open Viewer</button>
+      <button class="btn" onclick="send('#/title')">Title</button>
+      <button class="btn" onclick="send('#/intro')">Intro</button>
+      <button class="btn" onclick="send('#/tri')">Tri Standings</button>
+      <button class="btn" onclick="send('#/wc')">WC Standings</button>
+      <button class="btn" onclick="send('#/players')">Player Stats</button>
+    </div>
+    <div class="muted">Tip: After opening the viewer, move it to your program monitor and hit F11. Use these buttons for “pull” screens.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 10px">Triwizard Teams</h3>
+    <div class="grid">
+      <button class="btn" onclick="send('#/team/HOG')">HOG</button>
+      <button class="btn" onclick="send('#/team/RVN')">RVN</button>
+      <button class="btn" onclick="send('#/team/OWL')">OWL</button>
+      <button class="btn" onclick="send('#/team/OP')">OP</button>
+      <button class="btn" onclick="send('#/team/HAG')">HAG</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 10px">World Cup Teams</h3>
+    <div class="grid">
+      <button class="btn" onclick="send('#/team/BNG')">BNG</button>
+      <button class="btn" onclick="send('#/team/BD')">BD</button>
+      <button class="btn" onclick="send('#/team/CC')">CC</button>
+      <button class="btn" onclick="send('#/team/DQC')">DQC</button>
+      <button class="btn" onclick="send('#/team/NHK')">NHK</button>
+      <button class="btn" onclick="send('#/team/OBS')">OBS</button>
+      <button class="btn" onclick="send('#/team/TI')">TI</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let viewer = null;
+document.getElementById('open').addEventListener('click', ()=>{
+  viewer = window.open('viewer.html#%2Ftitle','qr_viewer','noopener,width=1280,height=720');
+});
+function send(route){
+  if(!viewer || viewer.closed){
+    viewer = window.open('viewer.html'+route,'qr_viewer','noopener,width=1280,height=720');
+    return;
+  }
+  viewer.postMessage({type:'goto', route}, '*');
+}
+</script>
+</body>
+</html>
 
