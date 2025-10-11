@@ -1,175 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Seeker • Total Snitches Caught</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Seeker — Total Snitches Caught</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0c; --panel:#101010; --text:#f2f2f2; --muted:#bdbdbd;
+    --gold:#d6b36a; --line:rgba(214,179,106,.28);
+    --shadow:0 18px 58px rgba(0,0,0,.55); --r:18px;
+  }
+  html,body{height:100%;margin:0;background:radial-gradient(1200px 500px at 50% -10%,rgba(214,179,106,.08),transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.25))}
+  h1{font-size:clamp(22px,3.2vw,40px);margin:0}
+  .sub{color:var(--muted);font-size:13px}
+  .wrap{max-width:1300px;margin:26px auto;padding:0 16px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .btn{padding:8px 12px;border:1px solid var(--line);background:#141414;border-radius:12px;color:var(--text);cursor:pointer}
+  .btn.gold{background:rgba(214,179,106,.08);border-color:rgba(214,179,106,.45)}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+  @media (max-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media (max-width:820px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
 
-  <style>
-    :root{
-      --bg:#0a0b0e;
-      --panel:#141517;
-      --panel-2:#101214;
-      --gold:#d4af37;
-      --gold-soft:#c39a25;
-      --txt:#e8ecf6;
-      --muted:#aeb4c2;
-      --card-border:#3a2b10;
-      --elev: 0 8px 30px rgba(0,0,0,.35);
-    }
-    html,body{height:100%;margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1a1a1a,#0b0b0b) fixed;color:var(--txt);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;}
-    .wrap{min-height:100%;display:flex;flex-direction:column;gap:20px;padding:24px;box-sizing:border-box}
-    .titlebar{display:flex;align-items:end;gap:18px}
-    .titlebar h1{margin:0;font-size:28px;font-weight:800;letter-spacing:.3px}
-    .titlebar .sub{color:var(--muted);font-weight:600}
-    .grid{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:18px}
-    @media (max-width:1400px){ .grid{grid-template-columns:repeat(4,minmax(210px,1fr));} }
-    @media (max-width:960px){ .grid{grid-template-columns:repeat(2,minmax(210px,1fr));} }
+  /* Card */
+  .card{perspective:1200px}
+  .flip{
+    position:relative;width:100%;padding-top:140%;
+    transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.9,.2,1);
+    border-radius:var(--r);box-shadow:var(--shadow);
+  }
+  .card.revealed .flip{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:var(--r);backface-visibility:hidden;overflow:hidden;border:1px solid var(--line)}
+  .back{display:grid;place-items:center;background:linear-gradient(180deg,#141414,#0e0e0e)}
+  .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
+  .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-    /* Card */
-    .card{position:relative;perspective:1100px}
-    .inner{position:relative;width:100%;height:280px;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-    .card:hover .inner, .card.flipped .inner{transform:rotateY(180deg)}
-    .face{position:absolute;inset:0;background:linear-gradient(180deg,#151618 0%, #121315 70%);border:1px solid var(--card-border);border-radius:14px;box-shadow:var(--elev);backface-visibility:hidden;overflow:hidden}
-    .face.back{transform:rotateY(180deg);display:grid;place-items:center;background:linear-gradient(180deg,#121315 0%, #101112 60%);}
-    .face.back img{width:72px;height:72px;opacity:.9}
+  /* Top area – logo left, name + team stacked, all left-aligned */
+  .front .top{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:12px 12px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
+  }
+  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover;flex:0 0 auto}
+  .title-stack{min-width:0}
+  .player{
+    font-weight:800; letter-spacing:.2px; font-size:16px; line-height:1.15;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+  }
+  .team{color:var(--muted); font-size:12px; line-height:1; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
-    /* Header bar */
-    .top{height:44px;background:linear-gradient(180deg,rgba(212,175,55,.12),transparent);border-bottom:1px solid #2b230e;padding:6px 10px;display:grid;grid-template-columns:34px 1fr 34px;align-items:center;gap:10px}
-    .logo{width:28px;height:28px;border-radius:6px;background:#000;display:grid;place-items:center;overflow:hidden}
-    .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
-    .title-stack{line-height:1.05;text-align:center}              /* << center both lines */
-    .player{font-weight:800;font-size:14px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;justify-self:center}   /* << keep centered */
-    .team{font-weight:600;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;justify-self:center}      /* << keep centered */
-
-    /* Main body (image zone placeholder) */
-    .body{position:absolute;inset:44px 0 52px;display:grid;place-items:center;background:
-          radial-gradient(130px 60px at 50% 10%, rgba(212,175,55,.06), transparent 70%),
-          radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);}
-    .hint{opacity:.18;font-weight:700;letter-spacing:.2px;border:1px dashed rgba(212,175,55,.25);padding:8px 10px;border-radius:10px}
-
-    /* Footer total */
-    .foot{position:absolute;left:0;right:0;bottom:0;height:52px;background:linear-gradient(180deg,#191208, #13100a);border-top:1px solid #2b230e;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-    .foot .label{color:#d9caa2;font-size:12px;letter-spacing:.3px;opacity:.9}
-    .pill{min-width:38px;height:30px;padding:0 10px;border-radius:10px;background:linear-gradient(180deg,#2a210d,#1b1609);border:1px solid #6d5217;display:grid;place-items:center;font-weight:900;font-size:16px;color:#f0e6c7;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-
-    /* minimal focus/click flip for touch */
-    .card:focus-within .inner{transform:rotateY(180deg)}
-    .flipBtn{position:absolute;inset:0; background:transparent;border:0;color:transparent}
-
-    /* === Name positioning tweak ONLY (as requested) === */
-    .front .top{display:grid;grid-template-columns:34px 1fr 34px;align-items:center}
-    .front .top .title-stack{ text-align:center; }
-    .front .top .player, .front .top .team{
-      justify-self:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-
-    /* Page header chip */
-    .chip{background:linear-gradient(180deg,#2b230f,#171308);border:1px solid #5f4a1a;color:#f2e7c8;padding:6px 10px;border-radius:999px;font-weight:800;letter-spacing:.3px;font-size:12px}
-  </style>
+  /* Bottom total bar */
+  .bottom{
+    margin-top:auto; display:flex;align-items:center;justify-content:center;
+    padding:10px 12px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(214,179,106,.12),rgba(214,179,106,.06));
+  }
+  .label{font-size:12px;color:var(--muted);margin-right:8px}
+  .num{
+    font-weight:800;font-size:28px;line-height:1;border:2px solid var(--gold);
+    padding:6px 12px;border-radius:12px;background:rgba(214,179,106,.08);
+    box-shadow:inset 0 0 24px rgba(214,179,106,.08)
+  }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="titlebar">
-      <span class="chip">Seeker Stats</span>
-      <h1>Total Snitches Caught</h1>
-      <div class="sub">Click any card to reveal the L7 back</div>
-    </div>
-
-    <div id="grid" class="grid" aria-live="polite"></div>
+<header>
+  <div>
+    <h1 id="title">Total Snitches Caught</h1>
+    <div class="sub" id="subtitle">Seeker leaderboard — click any card to reveal. Press R to reset all.</div>
   </div>
+  <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
+</header>
 
-  <script>
-    /* ---- Team name aliases for display only ---- */
-    const TEAM_ALIASES = {
-      "Crazy Comms": "Wholesome Comms",
-      "Dumbledorks Quidditch Club": "Dumbledorks Q.C.",
-      "Obscurus Quidditch Club": "Obscurus Q.C."
-    };
-    const niceTeam = n => TEAM_ALIASES[n] || n;
+<div class="wrap">
+  <div class="controls">
+    <button class="btn gold" id="revealAll">Reveal All</button>
+    <button class="btn" id="hideAll">Hide All</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="hint">If a logo doesn’t show, check your <code>assets/</code> filenames or tweak <code>LOGO_MAP</code>.</div>
+</div>
 
-    /* ---- Team -> logo file mapping (your /assets/ folder) ---- */
-    const TEAM_LOGOS = {
-      "Crazy Comms": "assets/crazy_comms.png",
-      "Wholesome Comms": "assets/crazy_comms.png",          // display alias, same logo file
-      "Dumbledorks Quidditch Club": "assets/dumbledorks_quidditch_club.png",
-      "Dumbledorks Q.C.": "assets/dumbledorks_quidditch_club.png",
-      "Bad Dwagons": "assets/bad_dwagons.png",
-      "Azkabangers": "assets/azkabangers.png",
-      "Thin Ice": "assets/thin_ice.png",
-      "Nimbus Nighthawks": "assets/nimbus_nighthawks.png",
-      "Obscurus Quidditch Club": "assets/obscurus_quidditch_club.png",
-      "Obscurus Q.C.": "assets/obscurus_quidditch_club.png",
-      "Hellfire Hogs": "assets/hellfire_hogs.png",
-      "Oakshaft Owls": "assets/oakshaft_owls.png",
-      "Knockturn Ravens": "assets/knockturn_ravens.png",
-      "Mad Mobsters": "assets/mad_mobsters.png"
-    };
-    const FALLBACK_LOGO = "assets/missing_logo.png";
-    const L7_LOGO_SMALL = "assets/L7_logo_small.png";
+<script>
+  /* Logo paths */
+  const LOGO_BASE = 'assets/';
+  const LOGO_MAP = {
+    RVN:'knockturn_ravens.png',
+    HAG:'wildcard_hagrids.png',
+    HOG:'hellfire_hogs.png',
+    OWL:'oakshaft_owls.png',
+    OP:'the_order_of_the_phoenoobz.png',
+    CC:'crazy_comms.png',                 // shows as “Wholesome Comms” below
+    TI:'thin_ice.png',
+    DQC:'dumbledorks_quidditch_club.png',
+    BD:'bad_dwagons.png',
+    NHK:'nimbus_nighthawks.png',
+    BNG:'azkabangers.png',
+    OBS:'obscurus_quidditch_club.png',
+    MISSING:'missing_logo.png'
+  };
+  const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-    /* ---- DATA (Seeker: Total Snitches Caught) ---- */
-    const rows = [
-      { player:"Lihsir",          team:"Crazy Comms",                total:22 },
-      { player:"JayGuard",        team:"Dumbledorks Quidditch Club", total:13 },
-      { player:"Zyn (Shade)",     team:"Bad Dwagons",                total:11 },
-      { player:"TRobbo11",        team:"Azkabangers",                 total: 8 },
-      { player:"Neo",             team:"Azkabangers",                 total: 7 },
-      { player:"Denji",           team:"Thin Ice",                    total: 7 },
-      { player:"Dementor",        team:"Thin Ice",                    total: 4 },
-      { player:"Tux",             team:"Crazy Comms",                total: 3 },
-      { player:"YukioTakeda",     team:"Thin Ice",                    total: 2 },
-      { player:"tee-dreamz",      team:"Dumbledorks Quidditch Club", total: 2 },
-      { player:"Chadismydad42",   team:"Dumbledorks Quidditch Club", total: 2 },
-      { player:"MichyMo",         team:"Nimbus Nighthawks",          total: 2 },
-      { player:"DiskJockii",      team:"Nimbus Nighthawks",          total: 2 },
-    ];
+  /* Friendly short names */
+  const SHORT_NAME = (name) => {
+    if (!name) return '';
+    if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
+    if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
+    if (/^Crazy Comms$/i.test(name))                 return 'Wholesome Comms';
+    return name;
+  };
 
-    /* ---- Render ---- */
-    const grid = document.getElementById('grid');
+  /* Data */
+  const DATA = [
+    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Crazy Comms' },
+    { player:'JayGuard',      total:13, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'Zyn (Shade)',   total:11, teamTag:'BD',  teamName:'Bad Dwagons' },
+    { player:'TRobbo11',      total: 8, teamTag:'BNG', teamName:'Azkabangers' },
+    { player:'Neo',           total: 7, teamTag:'BNG', teamName:'Azkabangers' },
+    { player:'Denji',         total: 7, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'Dementor',      total: 4, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Crazy Comms' },
+    { player:'YukioTakeda',   total: 2, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'tee-dreamz',    total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'Chadismydad42', total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'MichyMo',       total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+    { player:'DiskJockii',    total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+  ];
 
-    rows.forEach(r => {
-      const shownTeam = niceTeam(r.team);
-      const logoSrc = TEAM_LOGOS[shownTeam] || TEAM_LOGOS[r.team] || FALLBACK_LOGO;
+  const grid = document.getElementById('grid');
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <button class="flipBtn" aria-label="Flip card"></button>
-        <div class="inner">
-          <div class="face front">
-            <div class="top">
-              <div class="logo"><img src="${logoSrc}" alt="${shownTeam} logo" /></div>
-              <div class="title-stack">
-                <div class="player">${r.player}</div>
-                <div class="team">${shownTeam}</div>
-              </div>
-              <div></div>
-            </div>
-            <div class="body">
-              <div class="hint">click to reveal</div>
-            </div>
-            <div class="foot">
-              <div class="label">Total</div>
-              <div class="pill">${r.total}</div>
+  function makeCard(row){
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const niceTeam = SHORT_NAME(row.teamName || row.teamTag);
+    wrap.innerHTML = `
+      <div class="flip">
+        <div class="face back"><img alt="L7 logo" src="assets/L7_logo_small.png"></div>
+        <div class="face front">
+          <div class="top">
+            <img class="team-logo" alt="${row.teamTag}">
+            <div class="title-stack">
+              <div class="player" title="${row.player}">${row.player}</div>
+              <div class="team" title="${niceTeam}">${niceTeam}</div>
             </div>
           </div>
-
-          <div class="face back">
-            <img src="${L7_LOGO_SMALL}" alt="League 7" />
+          <div class="bottom">
+            <span class="label">Total</span>
+            <span class="num">${row.total}</span>
           </div>
         </div>
-      `;
-      // click-to-flip for mouse/touch
-      card.addEventListener('click', e => {
-        // ignore clicks on UI we might add later
-        if (e.target.closest('.flipBtn') || e.target.closest('.face')) {
-          card.classList.toggle('flipped');
-        }
-      });
-      grid.appendChild(card);
-    });
-  </script>
+      </div>`;
+    wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
+    wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
+    return wrap;
+  }
+
+  function render(){ grid.innerHTML=''; DATA.forEach(r=> grid.appendChild(makeCard(r))); }
+  render();
+
+  /* Controls */
+  document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
+  document.getElementById('hideAll').onclick   = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed'));
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='r') document.getElementById('hideAll').click(); });
+</script>
 </body>
 </html>
