@@ -3,172 +3,168 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Seeker Stats — Total Snitches Caught</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+<title>Seeker — Total Snitches Caught</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b0c10;
-    --panel:#111215;
-    --panel-2:#0f0f12;
-    --line:#3b2f20;
-    --muted:#b8b2a6;
-    --gold:#d6b36a;
-    --gold-soft:#c6a45a;
-    --text:#f3efe7;
-    --shadow:0 10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);
+    --bg:#0b0b0c; --panel:#101010; --text:#f2f2f2; --muted:#bdbdbd;
+    --gold:#d6b36a; --line:rgba(214,179,106,.28);
+    --shadow:0 18px 58px rgba(0,0,0,.55); --r:18px;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:radial-gradient(1200px 700px at 50% -10%, #1a1510 0%, var(--bg) 65%);color:var(--text);font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
-  .wrap{max-width:1400px;margin:auto;padding:28px 18px 60px}
+  html,body{height:100%;margin:0;background:radial-gradient(1200px 500px at 50% -10%,rgba(214,179,106,.08),transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.25))}
+  h1{font-size:clamp(22px,3.2vw,40px);margin:0}
+  .sub{color:var(--muted);font-size:13px}
+  .wrap{max-width:1300px;margin:26px auto;padding:0 16px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .btn{padding:8px 12px;border:1px solid var(--line);background:#141414;border-radius:12px;color:var(--text);cursor:pointer}
+  .btn.gold{background:rgba(214,179,106,.08);border-color:rgba(214,179,106,.45)}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+  @media (max-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media (max-width:820px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
 
-  /* Header */
-  .headline{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 18px}
-  h1{font-size:clamp(22px,4vw,36px);line-height:1.05;margin:0;font-weight:900;letter-spacing:.2px}
-  .sub{color:var(--muted);font-weight:600}
-  .crumb{display:inline-block;background:#19181a;border:1px solid var(--line);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px;letter-spacing:.2px}
+  /* Card */
+  .card{perspective:1200px}
+  .flip{
+    position:relative;width:100%;padding-top:140%;
+    transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.9,.2,1);
+    border-radius:var(--r);box-shadow:var(--shadow);
+  }
+  .card.revealed .flip{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:var(--r);backface-visibility:hidden;overflow:hidden;border:1px solid var(--line)}
+  .back{display:grid;place-items:center;background:linear-gradient(180deg,#141414,#0e0e0e)}
+  .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
+  .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-  /* Grid */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
-
-  /* Card shell / flip */
-  .card{position:relative;height:320px;perspective:1200px}
-  .flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.22,.61,.36,1)}
-  .card.flipped .flip{transform:rotateY(180deg)}
-  .face{position:absolute;inset:0;border-radius:18px;background:linear-gradient(180deg,#161414 0,#0f0f0f 100%);border:1px solid var(--line);box-shadow:var(--shadow);backface-visibility:hidden;overflow:hidden}
-  .face.back{display:grid;place-items:center;background:radial-gradient(80% 80% at 50% 0%, #201a13 0%, #0f0e0c 60%);transform:rotateY(180deg)}
-  .face.back img{width:90px;height:auto;opacity:.9;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
-
-  /* Front content */
-  .front{display:flex;flex-direction:column}
+  /* Top area – logo left, name + team stacked, all left-aligned */
   .front .top{
-    display:grid;
-    grid-template-columns:34px 1fr 34px; /* logo | centered names | ghost spacer */
-    align-items:center;
-    gap:10px;
-    padding:12px 12px;
-    border-bottom:1px solid var(--line);
+    display:flex;align-items:flex-start;gap:10px;
+    padding:12px 12px;border-bottom:1px solid var(--line);
     background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
   }
-  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:contain;border:1px solid #0008}
-  .title-stack{min-width:0;text-align:center}
+  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover;flex:0 0 auto}
+  .title-stack{min-width:0}
   .player{
-    font-weight:900;letter-spacing:.2px;font-size:16px;line-height:1.15;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+    font-weight:800; letter-spacing:.2px; font-size:16px; line-height:1.15;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
   }
-  .team{
-    color:var(--muted);font-size:12px;line-height:1;margin-top:2px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-
-  /* Big empty play area look */
-  .front .body{flex:1;background:
-      radial-gradient(120% 90% at 50% -20%, rgba(255,231,180,.06) 0, transparent 60%),
-      linear-gradient(180deg,#0f0f0f 0,#0c0c0d 100%);
-  }
+  .team{color:var(--muted); font-size:12px; line-height:1; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
   /* Bottom total bar */
-  .front .bottom{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(214,179,106,.06),rgba(0,0,0,.08))}
-  .label{color:var(--muted);font-weight:700}
-  .num{min-width:44px;height:36px;display:inline-grid;place-items:center;border-radius:10px;background:linear-gradient(180deg,#2a2317,#1c160f);border:1px solid #6a532e;color:#ffe9b8;font-weight:900;font-size:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 3px 10px rgba(0,0,0,.35)}
-
-  /* Click hint */
-  .hint{margin:10px 0 18px;color:var(--muted);font-size:12px}
-
-  /* Responsive tweak for tall phones */
-  @media (max-width:520px){
-    .card{height:300px}
+  .bottom{
+    margin-top:auto; display:flex;align-items:center;justify-content:center;
+    padding:10px 12px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(214,179,106,.12),rgba(214,179,106,.06));
+  }
+  .label{font-size:12px;color:var(--muted);margin-right:8px}
+  .num{
+    font-weight:800;font-size:28px;line-height:1;border:2px solid var(--gold);
+    padding:6px 12px;border-radius:12px;background:rgba(214,179,106,.08);
+    box-shadow:inset 0 0 24px rgba(214,179,106,.08)
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="headline">
-      <div>
-        <h1>Seeker Stats • Total Snitches Caught</h1>
-        <div class="sub">Click a card to flip • Black & Gold pack</div>
-      </div>
-      <div class="crumb">Season 3</div>
-    </div>
-    <div class="hint">Note: “Crazy Comms” displays as <strong>Wholesome Comms</strong>. Long team names are shortened (Dumbledorks Q.C., Obscurus Q.C.).</div>
-
-    <div id="grid" class="grid"></div>
+<header>
+  <div>
+    <h1 id="title">Total Snitches Caught</h1>
+    <div class="sub" id="subtitle">Seeker leaderboard — click any card to reveal. Press R to reset all.</div>
   </div>
+  <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <button class="btn gold" id="revealAll">Reveal All</button>
+    <button class="btn" id="hideAll">Hide All</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="hint">If a logo doesn’t show, check your <code>assets/</code> filenames or tweak <code>LOGO_MAP</code>.</div>
+</div>
 
 <script>
-  /* ---------- DATA ---------- */
-  // Supply team for each player (from your screenshot/notes).
-  // If you need to change, just edit the 'team' field.
-  const rows = [
-    { player:"Lihsir",        team:"Wholesome Comms", total:22 },
-    { player:"JayGuard",      team:"Dumbledorks Quidditch Club", total:13 },
-    { player:"Zyn (Shade)",   team:"Bad Dwagons", total:11 },
-    { player:"TRobbo11",      team:"Azkabangers", total:8 },
-    { player:"Neo",           team:"Azkabangers", total:7 },
-    { player:"Denji",         team:"Thin Ice", total:7 },
-    { player:"Dementor",      team:"Thin Ice", total:4 },
-    { player:"Tux",           team:"Wholesome Comms", total:3 },
-    { player:"YukioTakeda",   team:"Thin Ice", total:2 },
-    { player:"tee-dreamz",    team:"Dumbledorks Quidditch Club", total:2 },
-    { player:"Chadismydad42", team:"Dumbledorks Quidditch Club", total:2 },
-    { player:"MichyMo",       team:"Nimbus Nighthawks", total:2 },
-    { player:"DiskJockii",    team:"Nimbus Nighthawks", total:2 }
-  ];
+  /* Logo paths */
+  const LOGO_BASE = 'assets/';
+  const LOGO_MAP = {
+    RVN:'knockturn_ravens.png',
+    HAG:'wildcard_hagrids.png',
+    HOG:'hellfire_hogs.png',
+    OWL:'oakshaft_owls.png',
+    OP:'the_order_of_the_phoenoobz.png',
+    CC:'crazy_comms.png',                 // shows as “Wholesome Comms” below
+    TI:'thin_ice.png',
+    DQC:'dumbledorks_quidditch_club.png',
+    BD:'bad_dwagons.png',
+    NHK:'nimbus_nighthawks.png',
+    BNG:'azkabangers.png',
+    OBS:'obscurus_quidditch_club.png',
+    MISSING:'missing_logo.png'
+  };
+  const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-  /* ---------- TEAM NAME NORMALIZATION ---------- */
-  // displayName: short label; logoSlug: filename base in /assets
-  const TEAM_BOOK = {
-    "Wholesome Comms":         { displayName:"Wholesome Comms", logoSlug:"crazy_comms" }, // using your existing logo
-    "Crazy Comms":             { displayName:"Wholesome Comms", logoSlug:"crazy_comms" }, // safety alias
-    "Azkabangers":             { displayName:"Azkabangers", logoSlug:"azkabangers" },
-    "Bad Dwagons":             { displayName:"Bad Dwagons", logoSlug:"bad_dwagons" },
-    "Dumbledorks Quidditch Club": { displayName:"Dumbledorks Q.C.", logoSlug:"dumbledorks_quidditch_club" },
-    "Obscurus Quidditch Club": { displayName:"Obscurus Q.C.", logoSlug:"obscurus_quidditch_club" },
-    "Thin Ice":                { displayName:"Thin Ice", logoSlug:"thin_ice" },
-    "Nimbus Nighthawks":       { displayName:"Nimbus Nighthawks", logoSlug:"nimbus_nighthawks" },
+  /* Friendly short names */
+  const SHORT_NAME = (name) => {
+    if (!name) return '';
+    if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
+    if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
+    if (/^Crazy Comms$/i.test(name))                 return 'Wholesome Comms';
+    return name;
   };
 
-  function normalizeTeam(raw){
-    const hit = TEAM_BOOK[raw]?.displayName ? TEAM_BOOK[raw] : TEAM_BOOK["Wholesome Comms"]; // fallback prevents blank
-    return {
-      nice: hit.displayName,
-      logo: `assets/${hit.logoSlug}.png`,
-      tag: hit.logoSlug.toUpperCase()
-    };
-  }
+  /* Data */
+  const DATA = [
+    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Crazy Comms' },
+    { player:'JayGuard',      total:13, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'Zyn (Shade)',   total:11, teamTag:'BD',  teamName:'Bad Dwagons' },
+    { player:'TRobbo11',      total: 8, teamTag:'BNG', teamName:'Azkabangers' },
+    { player:'Neo',           total: 7, teamTag:'BNG', teamName:'Azkabangers' },
+    { player:'Denji',         total: 7, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'Dementor',      total: 4, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Crazy Comms' },
+    { player:'YukioTakeda',   total: 2, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'tee-dreamz',    total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'Chadismydad42', total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'MichyMo',       total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+    { player:'DiskJockii',    total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+  ];
 
-  /* ---------- CARD FACTORY ---------- */
+  const grid = document.getElementById('grid');
+
   function makeCard(row){
-    const teamBits = normalizeTeam(row.team);
-    const el = document.createElement("div");
-    el.className = "card";
-    el.innerHTML = `
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const niceTeam = SHORT_NAME(row.teamName || row.teamTag);
+    wrap.innerHTML = `
       <div class="flip">
-        <div class="face back">
-          <img src="assets/L7_logo_small.png" alt="League 7 logo">
-        </div>
+        <div class="face back"><img alt="L7 logo" src="assets/L7_logo_small.png"></div>
         <div class="face front">
           <div class="top">
-            <img class="team-logo" src="${teamBits.logo}" alt="${teamBits.tag}">
+            <img class="team-logo" alt="${row.teamTag}">
             <div class="title-stack">
               <div class="player" title="${row.player}">${row.player}</div>
-              <div class="team" title="${teamBits.nice}">${teamBits.nice}</div>
+              <div class="team" title="${niceTeam}">${niceTeam}</div>
             </div>
-            <div style="width:34px;height:34px"></div>
           </div>
-          <div class="body"></div>
           <div class="bottom">
             <span class="label">Total</span>
             <span class="num">${row.total}</span>
           </div>
         </div>
       </div>`;
-    el.addEventListener("click", ()=> el.classList.toggle("flipped"));
-    return el;
+    wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
+    wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
+    return wrap;
   }
 
-  /* ---------- BOOT ---------- */
-  const grid = document.getElementById("grid");
-  rows.forEach(r => grid.appendChild(makeCard(r)));
+  function render(){ grid.innerHTML=''; DATA.forEach(r=> grid.appendChild(makeCard(r))); }
+  render();
+
+  /* Controls */
+  document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
+  document.getElementById('hideAll').onclick   = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed'));
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='r') document.getElementById('hideAll').click(); });
 </script>
 </body>
 </html>
