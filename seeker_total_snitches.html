@@ -33,28 +33,28 @@
     border-radius:var(--r);box-shadow:var(--shadow);
   }
   .card.revealed .flip{transform:rotateY(180deg)}
-  .face{
-    position:absolute;inset:0;border-radius:var(--r);backface-visibility:hidden;overflow:hidden;
-    border:1px solid var(--line);
-  }
+  .face{position:absolute;inset:0;border-radius:var(--r);backface-visibility:hidden;overflow:hidden;border:1px solid var(--line)}
   .back{display:grid;place-items:center;background:linear-gradient(180deg,#141414,#0e0e0e)}
   .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
   .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-  /* Top area with centered name + small logo in top-left */
+  /* Top area – logo left, name + team stacked, all left-aligned */
   .front .top{
-    position:relative; padding:16px 12px 12px; border-bottom:1px solid var(--line);
+    display:flex;align-items:flex-start;gap:10px;
+    padding:12px 12px;border-bottom:1px solid var(--line);
     background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
-    text-align:center;
   }
-  .team-logo{position:absolute; left:12px; top:12px; width:34px; height:34px; border-radius:10px; background:#111; object-fit:cover}
-  .player{font-weight:800; letter-spacing:.2px; font-size:18px; line-height:1.15}
-  .team{color:var(--muted); font-size:12px; line-height:1; margin-top:2px}
+  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover;flex:0 0 auto}
+  .title-stack{min-width:0}
+  .player{
+    font-weight:800; letter-spacing:.2px; font-size:16px; line-height:1.15;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+  }
+  .team{color:var(--muted); font-size:12px; line-height:1; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
   /* Bottom total bar */
   .bottom{
-    margin-top:auto;
-    display:flex;align-items:center;justify-content:center;
+    margin-top:auto; display:flex;align-items:center;justify-content:center;
     padding:10px 12px;border-top:1px solid var(--line);
     background:linear-gradient(180deg,rgba(214,179,106,.12),rgba(214,179,106,.06));
   }
@@ -85,17 +85,15 @@
 </div>
 
 <script>
-  /* Where your team logos live */
+  /* Logo paths */
   const LOGO_BASE = 'assets/';
-
-  /* Map tags → filenames (adjust if your filenames differ) */
   const LOGO_MAP = {
     RVN:'knockturn_ravens.png',
     HAG:'wildcard_hagrids.png',
     HOG:'hellfire_hogs.png',
     OWL:'oakshaft_owls.png',
     OP:'the_order_of_the_phoenoobz.png',
-    CC:'crazy_comms.png',                 // file name kept; text below shows Wholesome Comms
+    CC:'crazy_comms.png',                 // shows as “Wholesome Comms” below
     TI:'thin_ice.png',
     DQC:'dumbledorks_quidditch_club.png',
     BD:'bad_dwagons.png',
@@ -106,16 +104,25 @@
   };
   const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-  /* Data for this page (CC shows as Wholesome Comms) */
+  /* Friendly short names */
+  const SHORT_NAME = (name) => {
+    if (!name) return '';
+    if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
+    if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
+    if (/^Crazy Comms$/i.test(name))                 return 'Wholesome Comms';
+    return name;
+  };
+
+  /* Data */
   const DATA = [
-    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Wholesome Comms' },
+    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Crazy Comms' },
     { player:'JayGuard',      total:13, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
     { player:'Zyn (Shade)',   total:11, teamTag:'BD',  teamName:'Bad Dwagons' },
     { player:'TRobbo11',      total: 8, teamTag:'BNG', teamName:'Azkabangers' },
-    { player:'Neo',           total: 7, teamTag:'BNG', teamName:'Azkabangers' }, // WINneo
+    { player:'Neo',           total: 7, teamTag:'BNG', teamName:'Azkabangers' },
     { player:'Denji',         total: 7, teamTag:'TI',  teamName:'Thin Ice' },
     { player:'Dementor',      total: 4, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Wholesome Comms' }, // AlphaTux
+    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Crazy Comms' },
     { player:'YukioTakeda',   total: 2, teamTag:'TI',  teamName:'Thin Ice' },
     { player:'tee-dreamz',    total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
     { player:'Chadismydad42', total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
@@ -123,20 +130,22 @@
     { player:'DiskJockii',    total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
   ];
 
-  /* Render cards */
   const grid = document.getElementById('grid');
 
   function makeCard(row){
     const wrap = document.createElement('div');
     wrap.className = 'card';
+    const niceTeam = SHORT_NAME(row.teamName || row.teamTag);
     wrap.innerHTML = `
       <div class="flip">
         <div class="face back"><img alt="L7 logo" src="assets/L7_logo_small.png"></div>
         <div class="face front">
           <div class="top">
             <img class="team-logo" alt="${row.teamTag}">
-            <div class="player">${row.player}</div>
-            <div class="team">${row.teamName || row.teamTag}</div>
+            <div class="title-stack">
+              <div class="player" title="${row.player}">${row.player}</div>
+              <div class="team" title="${niceTeam}">${niceTeam}</div>
+            </div>
           </div>
           <div class="bottom">
             <span class="label">Total</span>
