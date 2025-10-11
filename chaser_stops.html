@@ -1,1 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chasers — Stops (steals+saves+interceptions)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0c; --text:#f2f2f2; --muted:#bdbdbd;
+    --gold:#d6b36a; --line:rgba(214,179,106,.28);
+    --shadow:0 18px 58px rgba(0,0,0,.55); --r:18px;
+  }
+  html,body{height:100%;margin:0;background:radial-gradient(1200px 500px at 50% -10%,rgba(214,179,106,.08),transparent 60%),var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.25))}
+  h1{font-size:clamp(22px,3.2vw,40px);margin:0}
+  .sub{color:var(--muted);font-size:13px}
+  .wrap{max-width:1300px;margin:26px auto;padding:0 16px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .btn{padding:8px 12px;border:1px solid var(--line);background:#141414;border-radius:12px;color:var(--text);cursor:pointer}
+  .btn.gold{background:rgba(214,179,106,.08);border-color:rgba(214,179,106,.45)}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+  @media (max-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media (max-width:820px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
+
+  /* Card */
+  .card{perspective:1200px}
+  .flip{
+    position:relative;width:100%;padding-top:140%;
+    transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.9,.2,1);
+    border-radius:var(--r);box-shadow:var(--shadow);
+  }
+  .card.revealed .flip{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:var(--r);backface-visibility:hidden;overflow:hidden;border:1px solid var(--line)}
+  .back{display:grid;place-items:center;background:linear-gradient(180deg,#141414,#0e0e0e)}
+  .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
+  .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
+
+  /* Top bar — logo left, team centered, spacer right */
+  .front .top{
+    display:grid; grid-template-columns:34px 1fr 34px;
+    align-items:center;
+    padding:12px 12px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
+  }
+  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover}
+  .title-stack{min-width:0; text-align:center;}
+  .team{color:#e9d7a2; font-weight:800; font-size:14px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+  /* Body with big player name plate (autosizes) */
+  .body{
+    position:absolute; inset:44px 0 52px;
+    display:grid; place-items:center;
+    background:
+      radial-gradient(140px 70px at 50% 15%, rgba(212,175,55,.08), transparent 70%),
+      radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
+    padding:0 10px;
+  }
+  .player-big{
+    display:inline-block;
+    padding:10px 18px;
+    border-radius:10px;
+    background:rgba(0,0,0,.35);
+    font-weight:900;
+    line-height:1.05;
+    letter-spacing:.2px;
+    color:#fff;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow: 0 0 0 1px rgba(212,175,55,.15) inset,
+                0 6px 16px rgba(0,0,0,.35);
+    max-width:92%;
+    font-size: clamp(20px, 3.8vw, 36px);
+  }
+
+  /* Bottom total bar */
+  .bottom{
+    margin-top:auto; display:flex;align-items:center;justify-content:center;
+    padding:10px 12px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(214,179,106,.12),rgba(214,179,106,.06));
+  }
+  .label{font-size:12px;color:#c9b788;margin-right:8px}
+  .num{
+    font-weight:800;font-size:28px;line-height:1;border:2px solid var(--gold);
+    padding:6px 12px;border-radius:12px;background:rgba(214,179,106,.08);
+    box-shadow:inset 0 0 24px rgba(214,179,106,.08)
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Stops (steals + saves + interceptions)</h1>
+    <div class="sub">Chasers — click any card to reveal. Press R to reset all.</div>
+  </div>
+  <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <button class="btn gold" id="revealAll">Reveal All</button>
+    <button class="btn" id="hideAll">Hide All</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="hint">If a logo/name is off, tweak <code>TEAM_OF</code> or <code>LOGO_MAP</code>. Unknown teams use a placeholder.</div>
+</div>
+
+<script>
+  /* Logo paths */
+  const LOGO_BASE = 'assets/';
+  const LOGO_MAP = {
+    RVN:'knockturn_ravens.png',
+    HAG:'wildcard_hagrids.png',
+    HOG:'hellfire_hogs.png',
+    OWL:'oakshaft_owls.png',
+    OP:'the_order_of_the_phoenoobz.png',
+    CC:'crazy_comms.png',                 // shows as “Wholesome Comms”
+    TI:'thin_ice.png',
+    DQC:'dumbledorks_quidditch_club.png',
+    BD:'bad_dwagons.png',
+    NHK:'nimbus_nighthawks.png',
+    BNG:'azkabangers.png',
+    OBS:'obscurus_quidditch_club.png',
+    MISSING:'missing_logo.png'
+  };
+  const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
+
+  /* Friendly short team text */
+  const SHORT_TEAM = (tag, name) => {
+    const n = name || tag;
+    if (tag === 'CC'  || /^Crazy Comms$/i.test(n)) return 'Wholesome Comms';
+    if (tag === 'DQC' || /^Dumbledorks Quidditch Club$/i.test(n)) return 'Dumbledorks Q.C.';
+    if (tag === 'OBS' || /^Obscurus Quidditch Club$/i.test(n))    return 'Obscurus Q.C.';
+    if (tag === 'BNG') return 'Azkabangers';
+    if (tag === 'TI')  return 'Thin Ice';
+    if (tag === 'BD')  return 'Bad Dwagons';
+    if (tag === 'NHK') return 'Nimbus Nighthawks';
+    if (tag === 'HOG') return 'Hellfire Hogs';
+    if (tag === 'OWL') return 'Oakshaft Owls';
+    if (tag === 'RVN') return 'Knockturn Ravens';
+    if (tag === 'OP')  return 'Order of the Phoenoobz';
+    if (tag === 'HAG') return 'Wildcard Hagrids';
+    return n;
+  };
+
+  /* Map players → teams (fill as you confirm; unknowns will show placeholder) */
+  const TEAM_OF = {
+    'Prophecy':      { tag:'CC',  name:'Crazy Comms' },
+    'SaffronJ':      null, // unknown
+    'UrboySkinnyHP': { tag:'BNG', name:'Azkabangers' }, // if you prefer “UrBoiSkinnyHP”, update the DATA name too
+    'LukisusLT':     { tag:'BD',  name:'Bad Dwagons' },
+    'Shony':         { tag:'CC',  name:'Crazy Comms' },
+    'DakeBlubey':    null, // unknown in S3
+    'UnknownKey':    { tag:'OBS', name:'Obscurus Quidditch Club' },
+    'VibinwithVin':  null, // possibly HOG earlier; leave null if unsure
+    'Teedreamz':     { tag:'DQC', name:'Dumbledorks Quidditch Club' },
+    'Glas':          { tag:'OBS', name:'Obscurus Quidditch Club' },
+    'Pingu':         { tag:'BD',  name:'Bad Dwagons' },
+    'Chintasu':      { tag:'OBS', name:'Obscurus Quidditch Club' },
+    'Gernett':       { tag:'OBS', name:'Obscurus Quidditch Club' }, // you said Gertnett on OBS
+    'Worden':        null,
+    'MoldyCh33ze':   null,
+    'Tuonela':       { tag:'CC',  name:'Crazy Comms' },
+    'LivvyGrace03':  null,
+    'Tediready':     null,
+    'Odarina':       { tag:'OBS', name:'Obscurus Quidditch Club' },
+    'Groobygames':   { tag:'DQC', name:'Dumbledorks Quidditch Club' },
+    'Chadismydad':   { tag:'DQC', name:'Dumbledorks Quidditch Club' },
+  };
+
+  /* DATA — Chasers: Stops */
+  const DATA = [
+    { player:'Prophecy',      total:18 },
+    { player:'SaffronJ',      total:16 },
+    { player:'UrboySkinnyHP', total:14 },
+    { player:'LukisusLT',     total:12 },
+    { player:'Shony',         total:12 },
+    { player:'DakeBlubey',    total:11 },
+    { player:'UnknownKey',    total:10 },
+    { player:'VibinwithVin',  total:10 },
+    { player:'Teedreamz',     total: 9 },
+    { player:'Glas',          total: 7 },
+    { player:'Pingu',         total: 7 },
+    { player:'Chintasu',      total: 6 },
+    { player:'Gernett',       total: 5 },
+    { player:'Worden',        total: 5 },
+    { player:'MoldyCh33ze',   total: 5 },
+    { player:'Tuonela',       total: 4 },
+    { player:'LivvyGrace03',  total: 4 },
+    { player:'Tediready',     total: 4 },
+    { player:'Odarina',       total: 4 },
+    { player:'Groobygames',   total: 4 },
+    { player:'Chadismydad',   total: 4 },
+  ];
+
+  const grid = document.getElementById('grid');
+
+  /* Autosize helpers */
+  function fitText(el, { max=36, min=14, step=1, pad=28 } = {}) {
+    if (!el) return;
+    const parent = el.parentElement;
+    let size = max; let guard = 0;
+    el.style.whiteSpace = 'nowrap';
+    el.style.fontSize = size + 'px';
+    while (el.scrollWidth > (parent.clientWidth - pad) && size > min && guard < 80) {
+      size -= step; el.style.fontSize = size + 'px'; guard++;
+    }
+  }
+  function fitTeam(el, { max=14, min=10, step=0.5, pad=10 } = {}) {
+    if (!el) return;
+    const parent = el.parentElement;
+    let size = max; let guard = 0;
+    el.style.whiteSpace = 'nowrap';
+    el.style.fontSize = size + 'px';
+    while (el.scrollWidth > (parent.clientWidth - pad) && size > min && guard < 80) {
+      size -= step; el.style.fontSize = size + 'px'; guard++;
+    }
+  }
+
+  function makeCard(row){
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+
+    const teamInfo = TEAM_OF[row.player] || null;
+    const teamTag  = teamInfo?.tag || 'MISSING';
+    const teamName = teamInfo ? SHORT_TEAM(teamInfo.tag, teamInfo.name) : '';
+
+    wrap.innerHTML = `
+      <div class="flip">
+        <div class="face back"><img alt="L7 logo" src="assets/L7_logo_small.png"></div>
+        <div class="face front">
+          <div class="top">
+            <img class="team-logo" alt="${teamTag}">
+            <div class="title-stack">
+              <div class="team" title="${teamName}">${teamName}</div>
+            </div>
+            <div></div>
+          </div>
+
+          <div class="body">
+            <div class="player-big" title="${row.player}">${row.player}</div>
+          </div>
+
+          <div class="bottom">
+            <span class="label">Stops</span>
+            <span class="num">${row.total}</span>
+          </div>
+        </div>
+      </div>`;
+
+    // set logo
+    wrap.querySelector('.team-logo').src = teamLogo(teamTag);
+
+    // flip behavior
+    wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
+
+    // autosize text
+    fitText(wrap.querySelector('.player-big'));
+    fitTeam(wrap.querySelector('.team'));
+
+    return wrap;
+  }
+
+  function render(){
+    grid.innerHTML = '';
+    DATA.forEach(r => grid.appendChild(makeCard(r)));
+  }
+  render();
+
+  /* Controls */
+  document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
+  document.getElementById('hideAll').onclick   = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed'));
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='r') document.getElementById('hideAll').click(); });
+</script>
+</body>
+</html>
 
