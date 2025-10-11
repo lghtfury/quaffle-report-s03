@@ -41,12 +41,12 @@
   .t-left img{height:92px;width:92px;border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
   .t-mid{text-align:center} .t-mid h3{font-size:34px;font-weight:800}
   .t-right{text-align:right}
-  .grid-3{display:grid;grid-template-columns:300px 1fr 320px;gap:16px;margin-top:12px}
+  .grid-2{display:grid;grid-template-columns:300px 1fr;gap:16px;margin-top:12px}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
   .panel h4{margin-bottom:8px}
   .roster ul{list-style:none;margin:0;padding:0;columns:2;column-gap:14px}
   .roster li{padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
-  @media (max-width:1100px){.team-header{grid-template-columns:160px 1fr 1fr}.grid-3{grid-template-columns:1fr}.roster ul{columns:1}}
+  @media (max-width:1100px){.team-header{grid-template-columns:160px 1fr 1fr}.grid-2{grid-template-columns:1fr}.roster ul{columns:1}}
   .hint{font-size:12px;color:var(--muted)}
 </style>
 </head>
@@ -116,69 +116,57 @@ const WC = {
   ]
 };
 
-/* ===== Rosters & captains (Season 3) ===== */
+/* ===== Rosters & captains (Season 3) — NO notes ===== */
 const TEAMS = {
   // Triwizard
   HOG:{name:'Hellfire Hogs', cap:'Moonech', co:'CraftyCat9',
     roster:['Moonech','CraftyCat9','Tamaquashad','Udomorn','Sweeping-flower3','NamesVALOR','RitchieCootes','luketurner','xOofPSN'],
-    mb:[['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','1-2']],
-    note:'Founder Melanore’s league; Hogs captain is Moonech.'
+    mb:[['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','1-2']]
   },
   RVN:{name:'Knockturn Ravens', cap:'DBRiley', co:'Pwatt86',
     roster:['DBRiley','timetwister2122','Kuragamie','PWatt86','Malikosis','ATelemarketer','DKaas','chaoscreature29','ItsLuna','Hawkeye'],
-    mb:[['vs Hellfire Hogs','2-0'],['vs Oakshaft Owls','2-1'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','2-0']],
-    note:'#1 seed. Riley passing armband to Pwatt due to injury.'
+    mb:[['vs Hellfire Hogs','2-0'],['vs Oakshaft Owls','2-1'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','2-0']]
   },
   OWL:{name:'Oakshaft Owls', cap:'OlympusMew', co:'—',
     roster:['OlympusMew','Tantrum1x','FM','Darkshadowfox91','FasterEddy135','Stormywhether','ItsSayruh','Chemicool516','Potology'],
-    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','0-2']],
-    note:'No co-captain listed.'
+    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','0-2']]
   },
   OP:{name:'The Order of the Phoenoobz', cap:'Cleet716', co:'Warbeard',
     roster:['Cleet716','WARB E4RD','OiledupDaddyHog','MegWood','CrazyChiika','NKatie22','Silverlimb7182','RealityOverload','Emera1d0wl','DoubleM_M46'],
-    mb:[['vs Hellfire Hogs','0-2'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','0-2'],['vs Wildcard Hagrids','0-2']],
-    note:'Hunting first series win.'
+    mb:[['vs Hellfire Hogs','0-2'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','0-2'],['vs Wildcard Hagrids','0-2']]
   },
   HAG:{name:'Wildcard Hagrids', cap:'Melanore', co:'—',
     roster:['Melanore','PS1HagridBot','LosBobs','shinobert','DandBang','Gavgum','SittingDuck2121','Banzo','KDtox','Clairefetti'],
-    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','2-0'],['vs The Order of the Phoenoobz','2-0']],
-    note:'First season competing for the league’s founder.'
+    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','2-0'],['vs The Order of the Phoenoobz','2-0']]
   },
   // World Cup
   CC:{name:'Crazy Comms', cap:'Lihsir', co:'—',
     roster:['Lihsir','tuonela','makoonQC','Prophecy','carddi','Winford','ShonyQC','AlphaTux','RealCyprisTTV'],
-    mb:[['vs Azkabangers','2-0'],['vs Bad Dwagons','2-0'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs Thin Ice','2-1']],
-    note:'Brief WHC rename; reverted to Crazy Comms.'
+    mb:[['vs Azkabangers','2-0'],['vs Bad Dwagons','2-0'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs Thin Ice','2-1']]
   },
   BNG:{name:'Azkabangers', cap:'JimTones', co:'—',
     roster:['JimTones','tediready','Aeriberry','DakeBlubey','AeriberrysWife','Glas','WINneo','UrBoiSkinnyHP','TRobbo11'],
-    mb:[['vs CC','0-2'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs TI','2-1'],['vs BD','2-0']],
-    note:'—'
+    mb:[['vs CC','0-2'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs TI','2-1'],['vs BD','2-0']]
   },
   DQC:{name:'Dumbledorks Quidditch Club', cap:'TheOTPHJ', co:'Grooby',
     roster:['TheOTPHJ','skipper13','Compugamer11','SaffronJolly','tee-dreamz','DYNAMITECOP3','1Worden','JayGuard','Chadismydad42','GroobyGames'],
-    mb:[['vs BNG','1-2'],['vs BD','2-1'],['vs CC','1-2'],['vs NHK','2-0'],['vs OBS','2-1'],['vs TI','2-1']],
-    note:'—'
+    mb:[['vs BNG','1-2'],['vs BD','2-1'],['vs CC','1-2'],['vs NHK','2-0'],['vs OBS','2-1'],['vs TI','2-1']]
   },
   TI:{name:'Thin Ice', cap:'Flyrish', co:'—',
     roster:['Flyrish','YukioTakeda','Banthanor','Pasawen','JMauler','Dementor','Denji','Chintasu','LinaRKH'],
-    mb:[['vs BD','2-0'],['vs CC','1-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs OBS','2-0'],['vs BNG','1-2']],
-    note:'—'
+    mb:[['vs BD','2-0'],['vs CC','1-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs OBS','2-0'],['vs BNG','1-2']]
   },
   BD:{name:'Bad Dwagons', cap:'Pingu', co:'LukisusLT',
     roster:['pingu','Beesman93','singularityyii','LukisusLT','livvygrace03','AshesOfAmber','Angel','YesImShade','VikRe'],
-    mb:[['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-1'],['vs OBS','2-0'],['vs TI','0-2'],['vs BNG','0-2']],
-    note:'Shade stepped down; Pingu takes over.'
+    mb:[['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-1'],['vs OBS','2-0'],['vs TI','0-2'],['vs BNG','0-2']]
   },
   OBS:{name:'Obscurus Quidditch Club', cap:'USAQuidditch', co:'—',
     roster:['USAQuidditch','Odarina','LifeSizeMidget','Zaiyuni','Blackrose243','Edirani','GreenBlackCat','legoo777','Zac.creatives'],
-    mb:[['vs BNG','0-2'],['vs BD','0-2'],['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs TI','0-2']],
-    note:'Heavy roster churn mid-season.'
+    mb:[['vs BNG','0-2'],['vs BD','0-2'],['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs TI','0-2']]
   },
   NHK:{name:'Nimbus Nighthawks', cap:'MichyMo', co:'—',
     roster:['MichyMo','CheeZeNQueso','DackJaniels','DiskJockii','DarkRitNighthawk','Cowboy_Jackman','CptCarnage','Itz_Harry447','VibinWithVin'],
-    mb:[['vs CC','0-2'],['vs DQC','0-2'],['vs TI','0-2'],['vs BNG','0-2'],['vs BD','1-2'],['vs OBS','0-2']],
-    note:'Aewdoido out; Cowboy_Jackman in.'
+    mb:[['vs CC','0-2'],['vs DQC','0-2'],['vs TI','0-2'],['vs BNG','0-2'],['vs BD','1-2'],['vs OBS','0-2']]
   },
 };
 
@@ -280,13 +268,10 @@ function render(route){
           <div><b>Co-Cap:</b> ${T.co}</div>
         </div>
       </div>
-      <div class="grid-3">
+      <div class="grid-2">
         <div class="panel roster"><h4>Roster</h4><ul>${T.roster.map(p=>`<li>${p}</li>`).join('')}</ul></div>
         <div class="panel"><h4>Match Breakdown</h4>
           <table><tbody>${T.mb.map(([opp,res])=>`<tr><td>${opp}</td><td>${res}</td></tr>`).join('')}</tbody></table>
-        </div>
-        <div class="panel">
-          <h4>Notes</h4><div>${T.note||'—'}</div>
         </div>
       </div>`;
     stage.append(big);
