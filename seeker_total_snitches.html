@@ -40,13 +40,16 @@
   .back{display:grid;place-items:center;background:linear-gradient(180deg,#141414,#0e0e0e)}
   .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
   .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
+
+  /* Top area with centered name + small logo in top-left */
   .front .top{
-    display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,rgba(214,179,106,.10),transparent)
+    position:relative; padding:16px 12px 12px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
+    text-align:center;
   }
-  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover}
-  .player{font-weight:800;letter-spacing:.2px}
-  .team{color:var(--muted);font-size:12px;line-height:1}
+  .team-logo{position:absolute; left:12px; top:12px; width:34px; height:34px; border-radius:10px; background:#111; object-fit:cover}
+  .player{font-weight:800; letter-spacing:.2px; font-size:18px; line-height:1.15}
+  .team{color:var(--muted); font-size:12px; line-height:1; margin-top:2px}
 
   /* Bottom total bar */
   .bottom{
@@ -92,7 +95,7 @@
     HOG:'hellfire_hogs.png',
     OWL:'oakshaft_owls.png',
     OP:'the_order_of_the_phoenoobz.png',
-    CC:'crazy_comms.png',
+    CC:'crazy_comms.png',                 // file name kept; text below shows Wholesome Comms
     TI:'thin_ice.png',
     DQC:'dumbledorks_quidditch_club.png',
     BD:'bad_dwagons.png',
@@ -103,16 +106,16 @@
   };
   const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-  /* Data for this page */
+  /* Data for this page (CC shows as Wholesome Comms) */
   const DATA = [
-    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Crazy Comms' },
+    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Wholesome Comms' },
     { player:'JayGuard',      total:13, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
     { player:'Zyn (Shade)',   total:11, teamTag:'BD',  teamName:'Bad Dwagons' },
     { player:'TRobbo11',      total: 8, teamTag:'BNG', teamName:'Azkabangers' },
     { player:'Neo',           total: 7, teamTag:'BNG', teamName:'Azkabangers' }, // WINneo
     { player:'Denji',         total: 7, teamTag:'TI',  teamName:'Thin Ice' },
     { player:'Dementor',      total: 4, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Crazy Comms' }, // AlphaTux
+    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Wholesome Comms' }, // AlphaTux
     { player:'YukioTakeda',   total: 2, teamTag:'TI',  teamName:'Thin Ice' },
     { player:'tee-dreamz',    total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
     { player:'Chadismydad42', total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
@@ -132,10 +135,8 @@
         <div class="face front">
           <div class="top">
             <img class="team-logo" alt="${row.teamTag}">
-            <div>
-              <div class="player">${row.player}</div>
-              <div class="team">${row.teamName || row.teamTag}</div>
-            </div>
+            <div class="player">${row.player}</div>
+            <div class="team">${row.teamName || row.teamTag}</div>
           </div>
           <div class="bottom">
             <span class="label">Total</span>
