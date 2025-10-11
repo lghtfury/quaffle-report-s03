@@ -133,7 +133,7 @@
     return name;
   };
 
-  /* Data */
+  /* UPDATED Data (added Rajon, Blackrose, Edirani, Gertnett) */
   const DATA = [
     { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Crazy Comms' },
     { player:'JayGuard',      total:13, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
@@ -148,13 +148,19 @@
     { player:'Chadismydad42', total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
     { player:'MichyMo',       total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
     { player:'DiskJockii',    total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+
+    /* === new entries (teams best-guess; tweak if needed) === */
+    { player:'Rajon',         total: 1, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },   // was TI earlier; set to OBS if S3
+    { player:'Blackrose',     total: 1, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
+    { player:'Edirani',       total: 1, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
+    { player:'Gertnett',      total: 1, teamTag:'MISSING', teamName:'' }                       // update when you confirm team
   ];
 
   const grid = document.getElementById('grid');
 
   /* --- Autosize helper for player names --- */
   function fitText(el, { max=36, min=14, step=1, pad=28 } = {}) {
-    const parent = el.parentElement;          // .body container
+    const parent = el.parentElement;
     let size = max;
     el.style.whiteSpace = 'nowrap';
     el.style.fontSize = size + 'px';
@@ -204,7 +210,7 @@
   function render(){
     grid.innerHTML='';
     DATA.forEach(r=> grid.appendChild(makeCard(r)));
-    // refit team line too (slight tweak for very long names)
+    // refit team line too (for very long names)
     document.querySelectorAll('.title-stack .team')
       .forEach(el => fitText(el, {max:14, min:10, step:0.5, pad:10}));
   }
