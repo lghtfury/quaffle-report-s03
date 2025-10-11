@@ -38,19 +38,39 @@
   .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
   .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-  /* Top area – logo left, name + team stacked, all left-aligned */
+  /* Top area – logo left, TEAM centered, spacer right (for true centering) */
   .front .top{
-    display:flex;align-items:flex-start;gap:10px;
+    display:grid; grid-template-columns:34px 1fr 34px;
+    align-items:center;
     padding:12px 12px;border-bottom:1px solid var(--line);
     background:linear-gradient(180deg,rgba(214,179,106,.10),transparent);
   }
-  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover;flex:0 0 auto}
-  .title-stack{min-width:0}
-  .player{
-    font-weight:800; letter-spacing:.2px; font-size:16px; line-height:1.15;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+  .team-logo{width:34px;height:34px;border-radius:10px;background:#111;object-fit:cover}
+  .title-stack{min-width:0; text-align:center;}
+  .team{color:var(--muted); font-size:12px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+  /* Center body with big player name plate */
+  .body{
+    position:absolute; inset:44px 0 52px;
+    display:grid; place-items:center;
+    background:
+      radial-gradient(140px 70px at 50% 15%, rgba(212,175,55,.08), transparent 70%),
+      radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
   }
-  .team{color:var(--muted); font-size:12px; line-height:1; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .player-big{
+    display:inline-block;
+    padding:10px 18px;
+    border-radius:10px;
+    background:rgba(0,0,0,.35);
+    font-weight:900;
+    font-size: clamp(20px, 3.8vw, 36px);
+    line-height:1.05;
+    letter-spacing:.2px;
+    color:#fff;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow: 0 0 0 1px rgba(212,175,55,.15) inset,
+                0 6px 16px rgba(0,0,0,.35);
+  }
 
   /* Bottom total bar */
   .bottom{
@@ -93,7 +113,7 @@
     HOG:'hellfire_hogs.png',
     OWL:'oakshaft_owls.png',
     OP:'the_order_of_the_phoenoobz.png',
-    CC:'crazy_comms.png',                 // shows as “Wholesome Comms” below
+    CC:'crazy_comms.png',                 // displays as “Wholesome Comms”
     TI:'thin_ice.png',
     DQC:'dumbledorks_quidditch_club.png',
     BD:'bad_dwagons.png',
@@ -143,10 +163,15 @@
           <div class="top">
             <img class="team-logo" alt="${row.teamTag}">
             <div class="title-stack">
-              <div class="player" title="${row.player}">${row.player}</div>
               <div class="team" title="${niceTeam}">${niceTeam}</div>
             </div>
+            <div></div>
           </div>
+
+          <div class="body">
+            <div class="player-big" title="${row.player}">${row.player}</div>
+          </div>
+
           <div class="bottom">
             <span class="label">Total</span>
             <span class="num">${row.total}</span>
