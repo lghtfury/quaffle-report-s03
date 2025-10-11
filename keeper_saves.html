@@ -136,21 +136,20 @@
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
     if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
-    if (/^Crazy Comms$/i.test(name))                 return 'Wholesome Comms';
     return name;
   };
 
   /* DATA — Keepers: Saves (S+Stl+Int) */
   const DATA = [
-    { player:'CountTails',   note:'saves leader', total:23, teamTag:'MISSING', teamName:'' },
+    { player:'CountTails',   note:'saves leader', total:23, teamTag:'CC', teamName:'' },
     { player:'Beesman',      note:'steals leader', total:23, teamTag:'BD',  teamName:'Bad Dwagons' },       // adjust if needed
     { player:'Compugamer11', note:'kicks leader',  total:18, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
-    { player:'Scourage',     note:'kicks leader',  total:16, teamTag:'MISSING', teamName:'' },
+    { player:'Scourage',     note:'kicks leader',  total:16, teamTag:'BNG', teamName:'' },
     { player:'DackJaniels',  note:'high kicks',    total:14, teamTag:'NHK', teamName:'Nimbus Nighthawks' }, // best guess
     { player:'LifesizeMidge',note:'high kicks',    total:13, teamTag:'NHK', teamName:'Nimbus Nighthawks' }, // best guess
     { player:'UrboiSkinnyHP',               total: 8, teamTag:'OWL', teamName:'Oakshaft Owls' },
     { player:'LinaRKH',                     total: 7, teamTag:'NHK', teamName:'Nimbus Nighthawks' },        // best guess
-    { player:'MoldyCh33ze',                 total: 6, teamTag:'MISSING', teamName:'' },
+    { player:'MoldyCh33ze',                 total: 6, teamTag:'NHK', teamName:'' },
     { player:'YukioTakeda',                 total: 4, teamTag:'TI',  teamName:'Thin Ice' },
   ];
 
@@ -231,4 +230,3 @@
 </script>
 </body>
 </html>
-
