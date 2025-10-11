@@ -48,8 +48,6 @@
   .roster li{padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
   @media (max-width:1100px){.team-header{grid-template-columns:160px 1fr 1fr}.grid-3{grid-template-columns:1fr}.roster ul{columns:1}}
   .hint{font-size:12px;color:var(--muted)}
-  .reveal{user-select:none;border:1px dashed var(--line);padding:12px;border-radius:10px;cursor:pointer;background:rgba(255,255,255,.02)}
-  .reveal.open{border-style:solid;background:rgba(214,179,106,.06)}
 </style>
 </head>
 <body>
@@ -66,8 +64,8 @@
 const LOGO_BASE = 'assets/';
 const LOGO_MAP = {
   RVN:'knockturn_ravens.png', HAG:'wildcard_hagrids.png', HOG:'hellfire_hogs.png',
-  OWL:'oakshaft_owls.png', OP:'obscurus_quidditch_club.png' /* fallback for OP if no custom */,
-  OPX:'the_order_of_the_phoenoobz.png', /* try this first for OP */
+  OWL:'oakshaft_owls.png', OP:'obscurus_quidditch_club.png', /* fallback for OP */
+  OPX:'the_order_of_the_phoenoobz.png',                       /* preferred for OP if present */
   CC:'crazy_comms.png', TI:'thin_ice.png', DQC:'dumbledorks_quidditch_club.png',
   BD:'bad_dwagons.png', NHK:'nimbus_nighthawks.png', BNG:'azkabangers.png', OBS:'obscurus_quidditch_club.png'
 };
@@ -184,12 +182,11 @@ const TEAMS = {
   },
 };
 
-/* ===== Routes in show order ===== */
+/* ===== Routes in show order (players removed) ===== */
 const ROUTES = [
   '#/title', '#/intro',
   '#/tri', '#/team/HOG', '#/team/RVN', '#/team/OWL', '#/team/OP', '#/team/HAG',
-  '#/wc', '#/team/BNG', '#/team/BD', '#/team/CC', '#/team/DQC', '#/team/NHK', '#/team/OBS', '#/team/TI',
-  '#/players'
+  '#/wc', '#/team/BNG', '#/team/BD', '#/team/CC', '#/team/DQC', '#/team/NHK', '#/team/OBS', '#/team/TI'
 ];
 
 /* ===== Renderers ===== */
@@ -209,7 +206,7 @@ function render(route){
     const img = document.createElement('img'); img.alt='Quaffle Report'; img.className='qr';
     img.onload=()=>img.classList.add('on');
     imgWithFallback(img, [
-      'assets/quaffle_report.png','assets/quaffle_report.webp'
+      'assets/quaffle_report.png', 'assets/L7_logo_full.png'
     ]);
     inner.append(img);
     const h1=document.createElement('h1'); h1.textContent='Season 3 • O.W.L.s Recap';
@@ -294,31 +291,6 @@ function render(route){
       </div>`;
     stage.append(big);
     const logo = big.querySelector('#tlogo'); imgWithFallback(logo, teamLogoPaths(arg));
-    return;
-  }
-
-  if(type==='players'){
-    const card=document.createElement('div'); card.className='card';
-    card.innerHTML = `
-      <h3 style="font-size:28px;margin-bottom:10px">Player Stats — OTPHJ Segment</h3>
-      <div id="pwrap" class="panel">Loading player stats (looking for <code>assets/players.json</code>)…</div>`;
-    stage.append(card);
-    // Try to load optional JSON if hosted (GitHub Pages). If not found, fall back.
-    fetch('assets/players.json', {cache:'no-store'}).then(r=>{
-      if(!r.ok) throw new Error('missing');
-      return r.json();
-    }).then(data=>{
-      const el = document.getElementById('pwrap');
-      if(!Array.isArray(data) || !data.length){ el.textContent='No player stats in file.'; return; }
-      const rows = data.slice(0,30).map(p=>`<tr><td>${p.player}</td><td>${p.team||''}</td><td>${p.metric1||''}</td><td>${p.metric2||''}</td></tr>`).join('');
-      el.innerHTML = `<table><thead><tr><th>Player</th><th>Team</th><th>Stat 1</th><th>Stat 2</th></tr></thead><tbody>${rows}</tbody></table>`;
-    }).catch(()=>{
-      const el = document.getElementById('pwrap');
-      el.innerHTML = `<div class="reveal" id="reveal">No <code>assets/players.json</code> found. Click to show placeholder.</div>
-      <div id="ph" style="display:none;margin-top:10px">Placeholder — wire OTPHJ’s export here.</div>`;
-      const r = document.getElementById('reveal'); const ph=document.getElementById('ph');
-      r.addEventListener('click',()=>{ r.classList.toggle('open'); ph.style.display = ph.style.display==='none' ? 'block' : 'none'; });
-    });
     return;
   }
 
