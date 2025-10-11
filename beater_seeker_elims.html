@@ -144,12 +144,28 @@
     { player:'laggylestrange',total: 5, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
     { player:'Aeriberry',     total: 5, teamTag:'BNG', teamName:'Azkabangers' },
     { player:'Flyrish',       total: 5, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'Angel',         total: 3, teamTag:'BD',  teamName:'Bad Dwagons' },   // change tag if needed
+    { player:'Angel',         total: 3, teamTag:'BD',  teamName:'Bad Dwagons' },
     { player:'CptCarnage',    total: 2, teamTag:'OWL', teamName:'Oakshaft Owls' },
     { player:'JayGuard',      total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
   ];
 
   const grid = document.getElementById('grid');
+
+  /* --- Auto-fit helper (players + team) --- */
+  function fitText(el, { max=38, min=12, step=0.5, pad=32 } = {}) {
+    if (!el) return;
+    const parent = el.parentElement;
+    if (!parent) return;
+    let size = max;
+    el.style.whiteSpace = 'nowrap';
+    el.style.fontSize = size + 'px';
+    let guard = 0;
+    while (el.scrollWidth > (parent.clientWidth - pad) && size > min && guard < 100) {
+      size -= step;
+      el.style.fontSize = size + 'px';
+      guard++;
+    }
+  }
 
   function makeCard(row){
     const wrap = document.createElement('div');
@@ -179,11 +195,28 @@
       </div>`;
     wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
+
+    // Auto-fit text
+    fitText(wrap.querySelector('.player-big'), { max: 38, min: 12, step: 0.5, pad: 28 });
+    fitText(wrap.querySelector('.title-stack .team'), { max: 14, min: 10, step: 0.5, pad: 10 });
+
     return wrap;
   }
 
-  function render(){ grid.innerHTML=''; DATA.forEach(r=> grid.appendChild(makeCard(r))); }
+  function render(){
+    grid.innerHTML='';
+    DATA.forEach(r=> grid.appendChild(makeCard(r)));
+  }
   render();
+
+  // Refit on resize
+  function reFitAll(){
+    document.querySelectorAll('.player-big').forEach(el => fitText(el, { max: 38, min: 12, step: 0.5, pad: 28 }));
+    document.querySelectorAll('.title-stack .team').forEach(el => fitText(el, { max: 14, min: 10, step: 0.5, pad: 10 }));
+  }
+  window.addEventListener('resize', () => {
+    clearTimeout(window.__rt); window.__rt = setTimeout(reFitAll, 120);
+  });
 
   /* Controls */
   document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
