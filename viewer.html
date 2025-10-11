@@ -30,14 +30,12 @@
   .hero h1{font-size:clamp(28px,4vw,54px);font-weight:800;margin-top:22px}
   .sub{opacity:.85}
   .pill{position:absolute;left:50%;transform:translateX(-50%);bottom:20px;font-size:12px;padding:6px 12px;border:1px solid rgba(214,179,106,.35);border-radius:999px;background:rgba(214,179,106,.06)}
-  /* table */
   table{width:100%;border-collapse:collapse;font-size:14px}
   thead th{padding:12px 14px;text-align:left;color:var(--muted);border-bottom:1px solid var(--line)}
   tbody td{padding:12px 14px;border-bottom:1px solid var(--row2)}
   tbody tr:nth-child(odd){background:var(--row2)} tbody tr:hover{background:var(--row)}
   .teamcell{display:flex;align-items:center;gap:10px}
   .logo{height:28px;width:28px;border-radius:10px}
-  /* team page */
   .team-header{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;align-items:center}
   .t-left{display:flex;gap:12px;align-items:center}
   .t-left img{height:92px;width:92px;border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
@@ -64,15 +62,24 @@
 </div>
 
 <script>
-/* ---------- Image helpers ---------- */
-const IMG = (file)=>[`images/teams/${file}`,`images/teams/${file.toLowerCase()}`];
+/* ---------- Image helpers (now using /assets) ---------- */
 const LOGO_MAP = {
   RVN:'knockturn_ravens.png', HAG:'wildcard_hagrids.png', HOG:'hellfire_hogs.png',
-  OWL:'oakshaft_owls.png', OP:'the_order_of_the_phoenoobz.png',
-  CC:'crazy_comms.png', TI:'thin_ice.png', DQC:'dumbledorks_quidditch_club.png',
-  BD:'bad_dwagons.png', NHK:'nimbus_nighthawks.png', BNG:'azkabangers.png', OBS:'obscurus_quidditch_club.png'
+  OWL:'oakshaft_owls.png', OP:'obscurus_quidditch_club.png', // OP has its own file too; swap if you prefer
+  OP_FILE:'the_order_of_the_phoenoobz.png',
+  CC:'crazy_comms.png', TI:'oakshaft_owls.png', // placeholder fixed below
+  DQC:'dumbledorks_quidditch_club.png',
+  BD:'bad_dwagons.png', NHK:'nimbus_nighthawks.png', BNG:'azkabangers.png',
+  OBS:'obscurus_quidditch_club.png'
 };
-function imgWithFallback(el, paths){ let i=0; const next=()=>{ if(i>=paths.length) return; el.onerror=()=>{i++;next()}; el.src=paths[i++] }; next(); }
+// correct Thin Ice + OP
+LOGO_MAP.TI = 'thin_ice.png';
+LOGO_MAP.OP  = 'the_order_of_the_phoenoobz.png';
+
+function imgWithFallback(el, files){
+  let i=0; const tryNext=()=>{ if(i>=files.length) return; el.onerror=()=>{i++;tryNext()}; el.src=`assets/${files[i++]}`; };
+  tryNext();
+}
 
 /* ---------- Standings (Season 3) ---------- */
 const TRI = {
@@ -117,7 +124,6 @@ const WC = {
 
 /* ---------- Rosters + captains (Season 3) ---------- */
 const TEAMS = {
-  // Triwizard
   HOG:{name:'Hellfire Hogs', cap:'Moonech', co:'CraftyCat9',
     roster:['Moonech','CraftyCat9','Tamaquashad','Udomorn','Sweeping-flower3','NamesVALOR','RitchieCootes','luketurner','xOofPSN'],
     mb:[['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','1-2'],['vs The Order of the Phoenoobz','2-0'],['vs Wildcard Hagrids','1-2']],
@@ -134,197 +140,7 @@ const TEAMS = {
     note:'No co-captain listed.'
   },
   OP:{name:'The Order of the Phoenoobz', cap:'Cleet716', co:'Warbeard',
-    roster:['Cleet716','WarbeE4RD','OiledupDaddyHog','MegWood','CrazyChiika','NKatie22','Silverlimb7182','RealityOverload','Emera1d0wl','DoubleM_M46'],
+    roster:['Cleet716','WARB E4RD','OiledupDaddyHog','MegWood','CrazyChiika','NKatie22','Silverlimb7182','RealityOverload','Emera1d0wl','DoubleM_M46'],
     mb:[['vs Hellfire Hogs','0-2'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','0-2'],['vs Wildcard Hagrids','0-2']],
     note:'Hunting first series win.'
   },
-  HAG:{name:'Wildcard Hagrids', cap:'Melanore', co:'—',
-    roster:['Melanore','PS1HagridBot','LosBobs','shinobert','DandBang','Gavgum','SittingDuck2121','Banzo','KDtox','Clairefetti'],
-    mb:[['vs Hellfire Hogs','2-1'],['vs Knockturn Ravens','0-2'],['vs Oakshaft Owls','2-0'],['vs The Order of the Phoenoobz','2-0']],
-    note:'First season competing for the league’s founder.'
-  },
-  // World Cup
-  CC:{name:'Crazy Comms', cap:'Lihsir', co:'—',
-    roster:['Lihsir','tuonela','makoonQC','Prophecy','carddi','Winford','ShonyQC','AlphaTux','RealCyprisTTV'],
-    mb:[['vs Azkabangers','2-0'],['vs Bad Dwagons','2-0'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs Thin Ice','2-1']],
-    note:'Brief WHC rename; reverted to Crazy Comms.'
-  },
-  BNG:{name:'Azkabangers', cap:'JimTones', co:'—',
-    roster:['JimTones','tediready','Aeriberry','DakeBlubey','AeriberrysWife','Glas','WINneo','UrBoiSkinnyHP','TRobbo11'],
-    mb:[['vs CC','0-2'],['vs DQC','2-1'],['vs NHK','2-0'],['vs OBS','2-0'],['vs TI','2-1'],['vs BD','2-0']],
-    note:'—'
-  },
-  DQC:{name:'Dumbledorks Quidditch Club', cap:'TheOTPHJ', co:'Grooby',
-    roster:['TheOTPHJ','skipper13','Compugamer11','SaffronJolly','tee-dreamz','DYNAMITECOP3','1Worden','JayGuard','Chadismydad42','GroobyGames'],
-    mb:[['vs BNG','1-2'],['vs BD','2-1'],['vs CC','1-2'],['vs NHK','2-0'],['vs OBS','2-1'],['vs TI','2-1']],
-    note:'—'
-  },
-  TI:{name:'Thin Ice', cap:'Flyrish', co:'—',
-    roster:['Flyrish','YukioTakeda','Banthanor','Pasawen','JMauler','Dementor','Denji','Chintasu','LinaRKH'],
-    mb:[['vs BD','2-0'],['vs CC','1-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs OBS','2-0'],['vs BNG','1-2']],
-    note:'—'
-  },
-  BD:{name:'Bad Dwagons', cap:'Pingu', co:'LukisusLT',
-    roster:['pingu','Beesman93','singularityyii','LukisusLT','livvygrace03','AshesOfAmber','Angel','YesImShade','VikRe'],
-    mb:[['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-1'],['vs OBS','2-0'],['vs TI','0-2'],['vs BNG','0-2']],
-    note:'Shade stepped down; Pingu takes over.'
-  },
-  OBS:{name:'Obscurus Quidditch Club', cap:'USAQuidditch', co:'—',
-    roster:['USAQuidditch','Odarina','LifeSizeMidget','Zaiyuni','Blackrose243','Edirani','GreenBlackCat','legoo777','Zac.creatives'],
-    mb:[['vs BNG','0-2'],['vs BD','0-2'],['vs CC','0-2'],['vs DQC','1-2'],['vs NHK','2-0'],['vs TI','0-2']],
-    note:'Heavy roster churn mid-season.'
-  },
-  NHK:{name:'Nimbus Nighthawks', cap:'MichyMo', co:'—',
-    roster:['MichyMo','CheeZeNQueso','DackJaniels','DiskJockii','DarkRitNighthawk','Cowboy_Jackman','CptCarnage','Itz_Harry447','VibinWithVin'],
-    mb:[['vs CC','0-2'],['vs DQC','0-2'],['vs TI','0-2'],['vs BNG','0-2'],['vs BD','1-2'],['vs OBS','0-2']],
-    note:'Aewdoido out; Cowboy_Jackman in.'
-  },
-};
-
-/* ---------- Slide order ---------- */
-const ROUTES = [
-  '#/title', '#/intro',
-  '#/tri', '#/team/HOG', '#/team/RVN', '#/team/OWL', '#/team/OP', '#/team/HAG',
-  '#/wc', '#/team/BNG', '#/team/BD', '#/team/CC', '#/team/DQC', '#/team/NHK', '#/team/OBS', '#/team/TI',
-  '#/players'
-];
-
-/* ---------- Renderers ---------- */
-const stage = document.getElementById('stage');
-const crumb = document.getElementById('crumb');
-
-function render(route){
-  stage.innerHTML = '';
-  const [_, type, arg] = route.split('/');
-  crumb.textContent = `Quaffle Report • ${route.replace('#/','')}`;
-
-  if(type==='title'){
-    const wrap = document.createElement('div'); wrap.className='card hero';
-    const inner = document.createElement('div'); inner.className='hero-inner';
-    const img = document.createElement('img'); img.alt='Quaffle Report'; img.className='qr';
-    img.onload=()=>img.classList.add('on');
-    imgWithFallback(img, [
-      'images/assets/quaffle_report.png','images/assets/quaffle_report.webp',
-      'images/assests/quaffle_report.png','images/assests/quaffle_report.webp'
-    ]);
-    inner.append(img);
-    const h1=document.createElement('h1'); h1.textContent='Season 3 • O.W.L.s Recap';
-    const sub=document.createElement('div'); sub.className='sub'; sub.textContent='Triwizard & World Cup Standings • Captains • Team Spotlight';
-    inner.append(h1,sub);
-    wrap.append(inner);
-    const pill=document.createElement('div'); pill.className='pill'; pill.textContent='Presented by League 7 — Press → to begin';
-    wrap.append(pill);
-    stage.append(wrap); return;
-  }
-
-  if(type==='intro'){
-    const card=document.createElement('div'); card.className='card';
-    card.innerHTML = `
-      <h3 style="font-size:28px;margin-bottom:10px">Tonight’s Broadcast</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="panel"><h4>Hosts</h4><div>Hosted by <b>Riley</b></div><div>Co-Hosted by <b>N E O</b> & <b>Winford</b></div></div>
-        <div class="panel"><h4>Analyst</h4><div>World Cup Stats by <b>OTPHJ</b></div></div>
-        <div class="panel"><h4>On-Field Leadership</h4><div>Captains: <b>MichyMo</b>, <b>Flyrish</b></div><div>Co-Captain: <b>Grooby</b></div></div>
-        <div class="panel"><h4>Production</h4><div>Produced by <b>Timetwister</b></div></div>
-      </div>`;
-    stage.append(card); return;
-  }
-
-  if(type==='tri' || type==='wc'){
-    const spec = (type==='tri') ? TRI : WC;
-    const title = (type==='tri') ? 'Triwizard Cup Division — Team Statistics' : 'World Cup Division — Team Statistics';
-    const card=document.createElement('div'); card.className='card';
-    const h=document.createElement('h4'); h.textContent=title; card.append(h);
-    const tbl=document.createElement('table');
-    tbl.innerHTML = `<thead><tr>
-      <th style="width:360px">Team</th><th>MW</th><th>GW</th><th>GWR</th><th>PS</th><th>PC</th><th>#M</th><th>#G</th>
-    </tr></thead><tbody></tbody>`;
-    const tb=tbl.querySelector('tbody');
-    spec.table.forEach(([tag,name,mw,gw,gwr,ps,pc,m,g])=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td class="teamcell"><img class="logo" alt=""><span>${name}</span></td>
-        <td>${mw}</td><td>${gw}</td><td>${gwr}</td><td>${ps}</td><td>${pc}</td><td>${m}</td><td>${g}</td>`;
-      const img=tr.querySelector('img'); imgWithFallback(img, IMG(LOGO_MAP[tag]||'missing_logo.png'));
-      tb.append(tr);
-    });
-    card.append(tbl);
-
-    const h2=document.createElement('h4'); h2.style.marginTop='20px';
-    h2.textContent = (type==='tri') ? 'Triwizard — Team vs. Team' : 'World Cup — Team vs. Team';
-    card.append(h2);
-
-    const tbl2=document.createElement('table');
-    const headCols = spec.cols.map(c=>`<th>${c}</th>`).join('');
-    tbl2.innerHTML = `<thead><tr><th>Team vs. Team</th>${headCols}</tr></thead><tbody></tbody>`;
-    const tb2=tbl2.querySelector('tbody');
-    spec.h2h.forEach(row=>{
-      const [label,...vals]=row;
-      const tr=document.createElement('tr');
-      tr.innerHTML = `<td>${label}</td>${vals.map(v=>`<td>${v}</td>`).join('')}`;
-      tb2.append(tr);
-    });
-    card.append(tbl2);
-    stage.append(card); return;
-  }
-
-  if(type==='team' && arg && TEAMS[arg]){
-    const T = TEAMS[arg];
-    const big=document.createElement('div'); big.className='card';
-    big.innerHTML = `
-      <div class="team-header">
-        <div class="t-left"><img id="tlogo" alt=""><div></div></div>
-        <div class="t-mid"><h3>${T.name}</h3></div>
-        <div class="t-right">
-          <div><b>Capt:</b> ${T.cap}</div>
-          <div><b>Co-Cap:</b> ${T.co}</div>
-        </div>
-      </div>
-      <div class="grid-3">
-        <div class="panel roster"><h4>Roster</h4><ul>${T.roster.map(p=>`<li>${p}</li>`).join('')}</ul></div>
-        <div class="panel"><h4>Match Breakdown</h4>
-          <table><tbody>${T.mb.map(([opp,res])=>`<tr><td>${opp}</td><td>${res}</td></tr>`).join('')}</tbody></table>
-        </div>
-        <div class="panel">
-          <h4>Notes</h4><div>${T.note||'—'}</div>
-        </div>
-      </div>`;
-    stage.append(big);
-    const logo = big.querySelector('#tlogo'); imgWithFallback(logo, IMG(LOGO_MAP[arg]||'missing_logo.png'));
-    return;
-  }
-
-  if(type==='players'){
-    const card=document.createElement('div'); card.className='card';
-    card.innerHTML = `
-      <h3 style="font-size:28px;margin-bottom:10px">Player Stats — OTPHJ Segment</h3>
-      <div class="reveal" id="reveal">Click to reveal (placeholder — wire your data here)</div>`;
-    stage.append(card);
-    const box = document.getElementById('reveal');
-    box.addEventListener('click', ()=> box.classList.toggle('open'));
-    return;
-  }
-
-  const msg=document.createElement('div'); msg.className='card center'; msg.style.minHeight='40vh';
-  msg.innerHTML = `<div>Unknown route: <code>${route}</code></div>`;
-  stage.append(msg);
-}
-
-/* ---------- Navigation + control bridge ---------- */
-function setRoute(r){ location.hash=r; render(r) }
-window.addEventListener('hashchange', ()=> render(location.hash||ROUTES[0]));
-document.addEventListener('keydown', e=>{
-  const i = ROUTES.indexOf(location.hash||ROUTES[0]);
-  if(e.key==='ArrowRight') setRoute(ROUTES[Math.min(i+1, ROUTES.length-1)]);
-  if(e.key==='ArrowLeft')  setRoute(ROUTES[Math.max(i-1, 0)]);
-});
-window.addEventListener('message', ev=>{
-  if(ev.data?.type==='goto' && typeof ev.data.route==='string'){ setRoute(ev.data.route) }
-});
-
-/* boot */
-if(!location.hash) location.hash = ROUTES[0];
-render(location.hash);
-</script>
-</body>
-</html>
-
