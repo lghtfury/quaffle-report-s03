@@ -152,6 +152,20 @@
 
   const grid = document.getElementById('grid');
 
+  /* --- Autosize helper for player names --- */
+  function fitText(el, { max=36, min=14, step=1, pad=28 } = {}) {
+    const parent = el.parentElement;          // .body container
+    let size = max;
+    el.style.whiteSpace = 'nowrap';
+    el.style.fontSize = size + 'px';
+    let guard = 0;
+    while (el.scrollWidth > (parent.clientWidth - pad) && size > min && guard < 60) {
+      size -= step;
+      el.style.fontSize = size + 'px';
+      guard++;
+    }
+  }
+
   function makeCard(row){
     const wrap = document.createElement('div');
     wrap.className = 'card';
@@ -180,11 +194,32 @@
       </div>`;
     wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
+
+    /* shrink the player name if needed */
+    fitText(wrap.querySelector('.player-big'));
+
     return wrap;
   }
 
-  function render(){ grid.innerHTML=''; DATA.forEach(r=> grid.appendChild(makeCard(r))); }
+  function render(){
+    grid.innerHTML='';
+    DATA.forEach(r=> grid.appendChild(makeCard(r)));
+    // refit team line too (slight tweak for very long names)
+    document.querySelectorAll('.title-stack .team')
+      .forEach(el => fitText(el, {max:14, min:10, step:0.5, pad:10}));
+  }
   render();
+
+  // Refit on resize
+  const reFitAll = () => {
+    document.querySelectorAll('.player-big').forEach(el => fitText(el));
+    document.querySelectorAll('.title-stack .team')
+      .forEach(el => fitText(el, {max:14, min:10, step:0.5, pad:10}));
+  };
+  window.addEventListener('resize', () => {
+    clearTimeout(window.__rt);
+    window.__rt = setTimeout(reFitAll, 120);
+  });
 
   /* Controls */
   document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
