@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Seeker • Total Snitches Caught</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/cards.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1 id="title"></h1>
+    <div class="sub" id="subtitle"></div>
+  </div>
+  <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
+</header>
 
+<div class="wrap">
+  <div class="controls">
+    <button class="btn gold" id="revealAll">Reveal All</button>
+    <button class="btn" id="hideAll">Hide All</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="hint">Card back uses L7 logo. Front shows team logo + player + total.</div>
+</div>
+
+<!-- Category config + data -->
+<script>
+  const CARD_TITLE = 'Total Snitches Caught';
+  const CARD_SUBTITLE = 'Seeker leaderboard — click to reveal. Press R to reset all.';
+  const DATA = [
+    { player:'Lihsir',        total:22, teamTag:'CC',  teamName:'Crazy Comms' },
+    { player:'JayGuard',      total:13, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'Zyn (Shade)',   total:11, teamTag:'BD',  teamName:'Bad Dwagons' },
+    { player:'TRobbo11',      total: 8, teamTag:'BNG', teamName:'Azkabangers' },
+    { player:'Neo',           total: 7, teamTag:'BNG', teamName:'Azkabangers' }, // WINneo
+    { player:'Denji',         total: 7, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'Dementor',      total: 4, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'Tux',           total: 3, teamTag:'CC',  teamName:'Crazy Comms' }, // AlphaTux
+    { player:'YukioTakeda',   total: 2, teamTag:'TI',  teamName:'Thin Ice' },
+    { player:'tee-dreamz',    total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'Chadismydad42', total: 2, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
+    { player:'MichyMo',       total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+    { player:'DiskJockii',    total: 2, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
+  ];
+</script>
+
+<!-- Shared logic -->
+<script src="js/cards.js"></script>
+<script>renderCardsPage();</script>
+</body>
+</html>
