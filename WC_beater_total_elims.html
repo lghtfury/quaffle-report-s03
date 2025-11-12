@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Beaters — Total Eliminations</title>
+<title>World Cup Beaters — Total Eliminations</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -25,7 +25,6 @@
   @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
   .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
 
-  /* Card */
   .card{perspective:1200px}
   .flip{
     position:relative;width:100%;padding-top:140%;
@@ -38,7 +37,6 @@
   .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
   .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-  /* Top bar — logo left, team centered, spacer right */
   .front .top{
     display:grid; grid-template-columns:34px 1fr 34px;
     align-items:center;
@@ -49,7 +47,6 @@
   .title-stack{min-width:0; text-align:center;}
   .team{color:var(--muted); font-size:12px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
-  /* Center body with big player name plate + auto-fit */
   .body{
     position:absolute; inset:44px 0 52px;
     display:grid; place-items:center;
@@ -74,7 +71,6 @@
     font-size: clamp(20px, 3.8vw, 36px);
   }
 
-  /* Bottom total bar */
   .bottom{
     margin-top:auto; display:flex;align-items:center;justify-content:center;
     padding:10px 12px;border-top:1px solid var(--line);
@@ -92,7 +88,7 @@
 <header>
   <div>
     <h1 id="title">Total Eliminations</h1>
-    <div class="sub" id="subtitle">Beater leaderboard — click any card to reveal. Press R to reset all.</div>
+    <div class="sub" id="subtitle">World Cup Beater leaderboard — click any card to reveal. Press R to reset all.</div>
   </div>
   <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
 </header>
@@ -107,6 +103,10 @@
 </div>
 
 <script>
+  /* === CONFIG: source sheet === */
+  const CSV_URL =
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=16673174&single=true&output=csv';
+
   /* Logo paths */
   const LOGO_BASE = 'assets/';
   const LOGO_MAP = {
@@ -115,7 +115,7 @@
     HOG:'hellfire_hogs.png',
     OWL:'oakshaft_owls.png',
     OP:'the_order_of_the_phoenoobz.png',
-    CC:'crazy_comms.png',                 // displays as “Wholesome Comms”
+    CC:'crazy_comms.png',
     TI:'thin_ice.png',
     DQC:'dumbledorks_quidditch_club.png',
     BD:'bad_dwagons.png',
@@ -124,9 +124,23 @@
     OBS:'obscurus_quidditch_club.png',
     MISSING:'missing_logo.png'
   };
+  const TEAM_TAGS = {
+    'crazy comms': 'CC',
+    'dumbledorks quidditch club': 'DQC',
+    'azkabangers': 'BNG',
+    'bad dwagons': 'BD',
+    'obscurus quidditch club': 'OBS',
+    'thin ice': 'TI',
+    'nimbus nighthawks': 'NHK'
+  };
+  function tagFor(teamName) {
+    if (!teamName) return 'MISSING';
+    const key = String(teamName).trim().toLowerCase();
+    return TEAM_TAGS[key] || 'MISSING';
+  }
+
   const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-  /* Friendly short names */
   const SHORT_NAME = (name) => {
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
@@ -135,23 +149,8 @@
     return name;
   };
 
-  /* DATA — Beaters: Total Eliminations */
-  const DATA = [
-    { player:'Winford',       total:42, teamTag:'CC',  teamName:'Crazy Comms' },
-    { player:'AshesOfAmber',  total:35, teamTag:'BD', teamName:'Bad Dwagons' },
-    { player:'TheOTPHJ',      total:27, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
-    { player:'CptCarnage',    total:18, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
-    { player:'laggylestrange',total:17, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
-    { player:'JimTones',      total:13, teamTag:'BNG', teamName:'Azkabangers' },
-    { player:'Aeriberry',     total:12, teamTag:'BNG', teamName:'Azkabangers' },
-    { player:'Flyrish',       total: 9, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'Edirani',       total: 6, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
-    { player:'Odarina',       total: 5, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
-  ];
-
   const grid = document.getElementById('grid');
 
-  /* Auto-fit helper (players + team) */
   function fitText(el, { max=38, min=12, step=0.5, pad=32 } = {}) {
     if (!el) return;
     const parent = el.parentElement;
@@ -195,21 +194,53 @@
       </div>`;
     wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
-
-    // Auto-fit text
     fitText(wrap.querySelector('.player-big'), { max: 38, min: 12, step: 0.5, pad: 28 });
     fitText(wrap.querySelector('.title-stack .team'), { max: 14, min: 10, step: 0.5, pad: 10 });
-
     return wrap;
   }
 
-  function render(){
+  function render(rows){
     grid.innerHTML='';
-    DATA.forEach(r=> grid.appendChild(makeCard(r)));
+    rows.forEach(r=> grid.appendChild(makeCard(r)));
   }
-  render();
 
-  // Refit on resize
+  function parseCSV(text){
+    const lines = text.trim().split(/\r?\n/);
+    return lines.map(l => l.split(','));
+  }
+
+  async function loadData(){
+    const res  = await fetch(CSV_URL, { cache: 'no-store' });
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    const out = [];
+    for (let i = 1; i < rows.length; i++){
+      const [teamName, player, seeker, total] = rows[i];
+      if (!teamName || !player || !total) continue;
+      const totalNum = Number(total);
+      if (Number.isNaN(totalNum)) continue;
+      const tag = tagFor(teamName);
+      out.push({ player: player.trim(), total: totalNum, teamTag: tag, teamName: teamName.trim() });
+    }
+    return out;
+  }
+
+  async function init(){
+    try{
+      const data = await loadData();
+      render(data);
+    }catch(err){
+      console.error('Failed to load sheet:', err);
+      render([]);
+      const msg = document.createElement('div');
+      msg.className = 'hint';
+      msg.textContent = 'Could not load data from the sheet.';
+      document.querySelector('.wrap').appendChild(msg);
+    }
+  }
+  init();
+
   function reFitAll(){
     document.querySelectorAll('.player-big').forEach(el => fitText(el, { max: 38, min: 12, step: 0.5, pad: 28 }));
     document.querySelectorAll('.title-stack .team').forEach(el => fitText(el, { max: 14, min: 10, step: 0.5, pad: 10 }));
@@ -218,11 +249,9 @@
     clearTimeout(window.__rt); window.__rt = setTimeout(reFitAll, 120);
   });
 
-  /* Controls */
   document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
   document.getElementById('hideAll').onclick   = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed'));
   document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='r') document.getElementById('hideAll').click(); });
 </script>
 </body>
 </html>
-
