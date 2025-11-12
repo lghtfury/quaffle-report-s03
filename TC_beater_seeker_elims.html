@@ -103,11 +103,11 @@
 </div>
 
 <script>
-  /* Same sheet - CSV endpoint */
+  /* Source sheet (CSV export of your link) */
   const CSV_URL =
     'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=16673174&single=true&output=csv';
 
-  /* Read Triwizard block (columns G,H,I) */
+  /* Triwizard block starts at columns G,H,I */
   const COL_OFFSET = 6; // A=0 ... G=6, H=7, I=8
 
   /* Logos */
@@ -127,22 +127,32 @@
     OBS:'obscurus_quidditch_club.png',
     MISSING:'missing_logo.png'
   };
-  const NAME_TO_TAG = {
-    'Knockturn Ravens':'RVN',
-    'Wildcard Hagrids':'HAG',
-    'Hellfire Hogs':'HOG',
-    'Oakshaft Owls':'OWL',
-    'The Order of the Phoenoobz':'OP',
-    'Crazy Comms':'CC',
-    'Thin Ice':'TI',
-    'Dumbledorks Quidditch Club':'DQC',
-    'Bad Dwagons':'BD',
-    'Nimbus Nighthawks':'NHK',
-    'Azkabangers':'BNG',
-    'Obscurus Quidditch Club':'OBS'
+
+  /* Case-insensitive mapping for robust tag lookup */
+  const TEAM_TAGS = {
+    'knockturn ravens': 'RVN',
+    'wildcard hagrids': 'HAG',
+    'hellfire hogs': 'HOG',
+    'oakshaft owls': 'OWL',
+    'order of the phoenoobz': 'OP',
+    'the order of the phoenoobz': 'OP',
+    'crazy comms': 'CC',
+    'thin ice': 'TI',
+    'dumbledorks quidditch club': 'DQC',
+    'bad dwagons': 'BD',
+    'nimbus nighthawks': 'NHK',
+    'azkabangers': 'BNG',
+    'obscurus quidditch club': 'OBS'
   };
+  function tagFor(teamName) {
+    if (!teamName) return 'MISSING';
+    const key = String(teamName).trim().toLowerCase();
+    return TEAM_TAGS[key] || 'MISSING';
+  }
+
   const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
+  /* Friendly short names for the card header */
   const SHORT_NAME = (name) => {
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
@@ -177,25 +187,26 @@
         <div class="face back"><img alt="L7 logo" src="assets/L7_logo_small.png"></div>
         <div class="face front">
           <div class="top">
-            <img class="team-logo" alt="\${row.teamTag}">
+            <img class="team-logo" alt="${row.teamTag}">
             <div class="title-stack">
-              <div class="team" title="\${niceTeam}">\${niceTeam}</div>
+              <div class="team" title="${niceTeam}">${niceTeam}</div>
             </div>
             <div></div>
           </div>
 
           <div class="body">
-            <div class="player-big" title="\${row.player}">\${row.player}</div>
+            <div class="player-big" title="${row.player}">${row.player}</div>
           </div>
 
           <div class="bottom">
             <span class="label">Total</span>
-            <span class="num">\${row.total}</span>
+            <span class="num">${row.total}</span>
           </div>
         </div>
       </div>`;
     wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
+
     fitText(wrap.querySelector('.player-big'), { max: 38, min: 12, step: 0.5, pad: 28 });
     fitText(wrap.querySelector('.title-stack .team'), { max: 14, min: 10, step: 0.5, pad: 10 });
     return wrap;
@@ -206,6 +217,7 @@
     rows.forEach(r=> grid.appendChild(makeCard(r)));
   }
 
+  /* Simple CSV parse for this sheet */
   function parseCSV(text){
     const lines = text.trim().split(/\r?\n/);
     return lines.map(l => l.split(','));
@@ -228,7 +240,7 @@
       const total = Number(stat);
       if (Number.isNaN(total)) continue;
 
-      const tag = NAME_TO_TAG[teamName.trim()] || 'MISSING';
+      const tag = tagFor(teamName);
       out.push({ player: player.trim(), total, teamTag: tag, teamName: teamName.trim() });
     }
     return out;
