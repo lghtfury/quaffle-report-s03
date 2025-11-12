@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Chasers — Goals</title>
+<title>World Cup Chasers — Goals Scored</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -25,7 +25,6 @@
   @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
   .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
 
-  /* Card */
   .card{perspective:1200px}
   .flip{
     position:relative;width:100%;padding-top:140%;
@@ -38,7 +37,6 @@
   .back img{width:66%;max-width:140px;opacity:.95;filter:drop-shadow(0 10px 30px rgba(214,179,106,.25))}
   .front{transform:rotateY(180deg);background:linear-gradient(180deg,#121212,#0b0b0b);display:flex;flex-direction:column}
 
-  /* Top bar — logo left, team centered, spacer right */
   .front .top{
     display:grid; grid-template-columns:34px 1fr 34px;
     align-items:center;
@@ -49,33 +47,21 @@
   .title-stack{min-width:0; text-align:center;}
   .team{color:var(--muted); font-size:12px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
-  /* Body with big player name */
   .body{
     position:absolute; inset:44px 0 52px;
     display:grid; place-items:center;
     background:
       radial-gradient(140px 70px at 50% 15%, rgba(212,175,55,.08), transparent 70%),
       radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
-    padding:0 10px;
-    text-align:center;
+    padding:0 10px; text-align:center;
   }
   .player-big{
-    display:inline-block;
-    padding:10px 18px;
-    border-radius:10px;
-    background:rgba(0,0,0,.35);
-    font-weight:900;
-    line-height:1.05;
-    letter-spacing:.2px;
-    color:#fff;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    box-shadow: 0 0 0 1px rgba(212,175,55,.15) inset,
-                0 6px 16px rgba(0,0,0,.35);
-    max-width:92%;
-    font-size: clamp(20px, 3.8vw, 36px);
+    display:inline-block; padding:10px 18px; border-radius:10px;
+    background:rgba(0,0,0,.35); font-weight:900; line-height:1.05; letter-spacing:.2px;
+    color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow:0 0 0 1px rgba(212,175,55,.15) inset, 0 6px 16px rgba(0,0,0,.35);
+    max-width:92%; font-size:clamp(20px, 3.8vw, 36px);
   }
-
-  /* Bottom total bar */
   .bottom{
     margin-top:auto; display:flex;align-items:center;justify-content:center;
     padding:10px 12px;border-top:1px solid var(--line);
@@ -92,8 +78,8 @@
 <body>
 <header>
   <div>
-    <h1 id="title">Goals</h1>
-    <div class="sub" id="subtitle">Chaser leaderboard — click any card to reveal. Press R to reset all.</div>
+    <h1 id="title">Goals Scored</h1>
+    <div class="sub" id="subtitle">World Cup Chaser leaderboard. Click a card to reveal. Press R to reset.</div>
   </div>
   <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
 </header>
@@ -104,11 +90,15 @@
     <button class="btn" id="hideAll">Hide All</button>
   </div>
   <div class="grid" id="grid"></div>
-  <div class="hint">If a logo looks off, edit the <code>teamTag</code>/<code>teamName</code> for that player in <code>DATA</code>.</div>
+  <div class="hint">If a logo is wrong, update <code>TEAM_TAGS</code> below.</div>
 </div>
 
 <script>
-  /* Logo paths */
+  /* CSV export of your Publish to web link for WorldCup_Chaser */
+  const CSV_URL =
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=684964704&single=true&output=csv';
+
+  /* Logos */
   const LOGO_BASE = 'assets/';
   const LOGO_MAP = {
     RVN:'knockturn_ravens.png',
@@ -116,7 +106,7 @@
     HOG:'hellfire_hogs.png',
     OWL:'oakshaft_owls.png',
     OP:'the_order_of_the_phoenoobz.png',
-    CC:'crazy_comms.png',                 // displays as “Wholesome Comms”
+    CC:'crazy_comms.png',
     TI:'thin_ice.png',
     DQC:'dumbledorks_quidditch_club.png',
     BD:'bad_dwagons.png',
@@ -125,9 +115,31 @@
     OBS:'obscurus_quidditch_club.png',
     MISSING:'missing_logo.png'
   };
+
+  /* Team name to tag mapping (case-insensitive) */
+  const TEAM_TAGS = {
+    'crazy comms':'CC',
+    'azkabangers':'BNG',
+    'nimbus nighthawks':'NHK',
+    'thin ice':'TI',
+    'bad dwagons':'BD',
+    'dumbledorks quidditch club':'DQC',
+    'obscurus quidditch club':'OBS',
+    'knockturn ravens':'RVN',
+    'wildcard hagrids':'HAG',
+    'hellfire hogs':'HOG',
+    'oakshaft owls':'OWL',
+    'order of the phoenoobz':'OP',
+    'the order of the phoenoobz':'OP'
+  };
+  function tagFor(teamName){
+    if (!teamName) return 'MISSING';
+    const key = String(teamName).trim().toLowerCase();
+    return TEAM_TAGS[key] || 'MISSING';
+  }
   const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-  /* Friendly short names */
+  /* Short display names for long teams */
   const SHORT_NAME = (name) => {
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
@@ -136,42 +148,16 @@
     return name;
   };
 
-  /* === DATA — Chasers: Goals ===
-     Team tags filled as best-guess from your sheet; tweak if needed. */
-  const DATA = [
-    { player:'Shony',             total:22, teamTag:'CC',  teamName:'Crazy Comms' },
-    { player:'DakeBlubey',        total:19, teamTag:'BNG', teamName:'Azkabangers' },
-    { player:'Pasawen',           total:17, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'VibinwithVin',      total:17, teamTag:'OWL', teamName:'Oakshaft Owls' },
-    { player:'UrboiSkinnyHP',     total:16, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
-    { player:'Tediready',         total:16, teamTag:'BNG', teamName:'Azkabangers' },
-    { player:'GroobyGames',       total:14, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
-    { player:'LukisusLT (Kalu)',  total:14, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'Carddi',            total:13, teamTag:'CC',  teamName:'Crazy Comms' },
-    { player:'Teedreamz',         total:12, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
-    { player:'UnknownKey',        total:11, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
-    { player:'Banthanor',         total:11, teamTag:'TI',  teamName:'Thin Ice' },
-    { player:'Odarina',           total:10, teamTag:'OBS', teamName:'Obscurus Quidditch Club' },
-    { player:'Chadismydad42',     total: 8, teamTag:'DQC', teamName:'Dumbledorks Quidditch Club' },
-    { player:'Chintasu',          total: 8, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
-    { player:'Singularity',       total: 8, teamTag:'BD',  teamName:'Bad Dwagons' },
-    { player:'Glas',              total: 7, teamTag:'BNG', teamName:'Azkabangers' },
-    { player:'Prophecy',          total: 7, teamTag:'CC',  teamName:'Crazy Comms' },
-    { player:'MoldyCh33ze',       total: 7, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
-    { player:'DarkritNighthawk',  total: 7, teamTag:'NHK', teamName:'Nimbus Nighthawks' },
-  ];
-
   const grid = document.getElementById('grid');
 
-  /* Auto-fit helper for long names / team lines */
-  function fitText(el, { max=36, min=14, step=1, pad=28 } = {}) {
+  function fitText(el, { max=38, min=12, step=0.5, pad=28 } = {}){
     if (!el) return;
     const parent = el.parentElement;
     let size = max;
     el.style.whiteSpace = 'nowrap';
     el.style.fontSize = size + 'px';
     let guard = 0;
-    while (el.scrollWidth > (parent.clientWidth - pad) && size > min && guard < 80) {
+    while (el.scrollWidth > (parent.clientWidth - pad) && size > min && guard < 100){
       size -= step; el.style.fontSize = size + 'px'; guard++;
     }
   }
@@ -197,36 +183,76 @@
           </div>
 
           <div class="bottom">
-            <span class="label">Total</span>
+            <span class="label">Goals</span>
             <span class="num">${row.total}</span>
           </div>
         </div>
       </div>`;
     wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', ()=> wrap.classList.toggle('revealed'));
-
-    // auto-fit text
     fitText(wrap.querySelector('.player-big'));
-    fitText(wrap.querySelector('.title-stack .team'), {max:14, min:10, step:0.5, pad:10});
-
+    fitText(wrap.querySelector('.title-stack .team'), { max:14, min:10, step:0.5, pad:10 });
     return wrap;
   }
 
-  function render(){ grid.innerHTML=''; DATA.forEach(r=> grid.appendChild(makeCard(r))); }
-  render();
+  function render(rows){
+    grid.innerHTML = '';
+    rows.forEach(r => grid.appendChild(makeCard(r)));
+  }
 
-  // Refit on resize
+  function parseCSV(text){
+    const lines = text.trim().split(/\r?\n/);
+    return lines.map(l => l.split(','));
+  }
+
+  async function loadData(){
+    const res = await fetch(CSV_URL, { cache: 'no-store' });
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    const out = [];
+    for (let i = 1; i < rows.length; i++){ // skip header
+      const [teamName, player, goals] = rows[i];
+      if (!teamName || !player || !goals) continue;
+      const total = Number(goals);
+      if (Number.isNaN(total)) continue;
+
+      out.push({
+        player: player.trim(),
+        total,
+        teamTag: tagFor(teamName),
+        teamName: String(teamName).trim()
+      });
+    }
+    return out;
+  }
+
+  async function init(){
+    try{
+      const data = await loadData();
+      render(data);
+    }catch(err){
+      console.error(err);
+      render([]);
+      const msg = document.createElement('div');
+      msg.className = 'hint';
+      msg.textContent = 'Could not load data from the published sheet.';
+      document.querySelector('.wrap').appendChild(msg);
+    }
+  }
+  init();
+
   function reFitAll(){
     document.querySelectorAll('.player-big').forEach(el => fitText(el));
-    document.querySelectorAll('.title-stack .team').forEach(el => fitText(el, {max:14, min:10, step:0.5, pad:10}));
+    document.querySelectorAll('.title-stack .team').forEach(el => fitText(el, { max:14, min:10, step:0.5, pad:10 }));
   }
-  window.addEventListener('resize', () => { clearTimeout(window.__rt); window.__rt = setTimeout(reFitAll, 120); });
+  window.addEventListener('resize', () => {
+    clearTimeout(window.__rt); window.__rt = setTimeout(reFitAll, 120);
+  });
 
-  /* Controls */
   document.getElementById('revealAll').onclick = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
   document.getElementById('hideAll').onclick   = ()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed'));
-  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='r') document.getElementById('hideAll').click(); });
+  document.addEventListener('keydown', e => { if (e.key.toLowerCase()==='r') document.getElementById('hideAll').click(); });
 </script>
 </body>
 </html>
-
