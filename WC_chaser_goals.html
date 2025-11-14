@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>World Cup Chasers - Goals Scored</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
 <style>
   :root{
     --bg:#0b0b0c; --panel:#101010; --text:#f2f2f2; --muted:#bdbdbd;
@@ -60,6 +61,8 @@
     background:rgba(214,179,106,.08);
     border-color:rgba(214,179,106,.45);
   }
+
+  /* GRID */
   .grid{
     display:grid;
     grid-template-columns:repeat(6,1fr);
@@ -74,6 +77,7 @@
   @media (max-width:560px){
     .grid{grid-template-columns:repeat(2,1fr);}
   }
+
   .hint{
     font-size:12px;
     color:var(--muted);
@@ -81,6 +85,7 @@
     margin-top:18px;
   }
 
+  /* CARD */
   .card{perspective:1200px;}
   .flip{
     position:relative;
@@ -92,7 +97,6 @@
     box-shadow:var(--shadow);
   }
   .card.revealed .flip{transform:rotateY(180deg);}
-
   .face{
     position:absolute;
     inset:0;
@@ -102,29 +106,41 @@
     border:1px solid var(--line);
   }
 
-  /* FULL BACK IMAGE */
+  /* BACK FACE — now full-size */
   .back{
-    background-image:url("assets/lightning.png");
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
     display:flex;
     justify-content:center;
-    align-items:flex-start;
-    padding-top:12px;
+    align-items:center;
+    background:linear-gradient(180deg,#141414,#0e0e0e);
+    position:relative;
   }
 
+  .back img{
+    width:100%;
+    height:100%;
+    object-fit:contain;    /* FULL SIZE but proportional */
+    padding:20px;
+    opacity:.95;
+    filter:drop-shadow(0 10px 30px rgba(214,179,106,.25));
+  }
+
+  /* Rank badge */
   .rank-pill{
-    background:rgba(214,179,106,0.15);
+    position:absolute;
+    top:12px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(214,179,106,.18);
     border:1px solid var(--gold);
-    color:var(--gold);
-    padding:6px 12px;
-    font-size:14px;
-    border-radius:20px;
+    padding:4px 10px;
+    border-radius:40px;
+    font-size:12px;
     font-weight:700;
+    color:var(--gold);
     backdrop-filter:blur(4px);
   }
 
+  /* FRONT */
   .front{
     transform:rotateY(180deg);
     background:linear-gradient(180deg,#121212,#0b0b0b);
@@ -154,7 +170,6 @@
   .team{
     color:var(--muted);
     font-size:12px;
-    line-height:1;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -165,20 +180,16 @@
     inset:44px 0 52px;
     display:grid;
     place-items:center;
-    background:
-      radial-gradient(140px 70px at 50% 15%, rgba(212,175,55,.08), transparent 70%),
-      radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
-    padding:0 10px;
     text-align:center;
+    padding:0 10px;
   }
+
   .player-big{
     display:inline-block;
     padding:10px 18px;
     border-radius:10px;
     background:rgba(0,0,0,.35);
     font-weight:900;
-    line-height:1.05;
-    letter-spacing:.2px;
     color:#fff;
     white-space:nowrap;
     overflow:hidden;
@@ -189,6 +200,7 @@
     max-width:92%;
     font-size:clamp(20px, 3.8vw, 36px);
   }
+
   .bottom{
     margin-top:auto;
     display:flex;
@@ -206,7 +218,6 @@
   .num{
     font-weight:800;
     font-size:28px;
-    line-height:1;
     border:2px solid var(--gold);
     padding:6px 12px;
     border-radius:12px;
@@ -215,6 +226,7 @@
   }
 </style>
 </head>
+
 <body>
 <header>
   <div>
@@ -234,9 +246,11 @@
 </div>
 
 <script>
+  /* CSV URL */
   const CSV_URL =
     'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=684964704&single=true&output=csv';
 
+  /* TEAM LOGOS */
   const LOGO_BASE = 'assets/';
   const LOGO_MAP = {
     RVN:'knockturn_ravens.png',
@@ -272,12 +286,14 @@
 
   function tagFor(teamName){
     if (!teamName) return 'MISSING';
-    return TEAM_TAGS[teamName.trim().toLowerCase()] || 'MISSING';
+    const key = teamName.trim().toLowerCase();
+    return TEAM_TAGS[key] || 'MISSING';
   }
 
-  const SHORT_NAME = name => {
+  const SHORT_NAME = (name) => {
+    if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
-    if (/^Obscurus Quidditch Club$/i.test(name)) return 'Obscurus Q.C.';
+    if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
     return name;
   };
 
@@ -291,8 +307,7 @@
     el.style.whiteSpace = 'nowrap';
     el.style.fontSize = size + 'px';
     let guard = 0;
-    while (el.scrollWidth > (parent.clientWidth - settings.pad) &&
-           size > settings.min && guard < 100){
+    while (el.scrollWidth > (parent.clientWidth - settings.pad) && size > settings.min && guard < 100){
       size -= settings.step;
       el.style.fontSize = size + 'px';
       guard++;
@@ -306,10 +321,14 @@
 
     wrap.innerHTML = `
       <div class="flip">
+
+        <!-- BACK -->
         <div class="face back">
-          <div class="rank-pill">Rank #${row.rank}</div>
+          <span class="rank-pill">${row.rank}</span>
+          <img src="assets/lightning.png" alt="Lightning">
         </div>
 
+        <!-- FRONT -->
         <div class="face front">
           <div class="top">
             <img class="team-logo" alt="${row.teamTag}">
@@ -328,13 +347,14 @@
             <span class="num">${row.total}</span>
           </div>
         </div>
-      </div>`;
+      </div>
+    `;
 
     wrap.querySelector('.team-logo').src = LOGO_BASE + (LOGO_MAP[row.teamTag] || LOGO_MAP.MISSING);
     wrap.addEventListener('click', () => wrap.classList.toggle('revealed'));
 
     fitText(wrap.querySelector('.player-big'));
-    fitText(wrap.querySelector('.team'), { max:14, min:10, step:0.5, pad:10 });
+    fitText(wrap.querySelector('.title-stack .team'), { max:14, min:10, step:0.5, pad:10 });
 
     return wrap;
   }
@@ -357,74 +377,77 @@
 
     for (let i = 1; i < rows.length; i++){
       const row = rows[i];
-      if (!row || row.length < 3) continue;
-
       const teamName = row[0];
       const player = row[1];
-      const total = parseFloat(row[2]);
+      const goals = parseFloat(row[2]);
 
-      if (!teamName || !player) continue;
-      if (!Number.isFinite(total)) continue;
-      if (total <= 0) continue; // Hide 0-goal players
+      if (!teamName || !player || !Number.isFinite(goals)) continue;
 
       out.push({
         player: player.trim(),
-        total,
+        total: goals,
         teamTag: tagFor(teamName),
         teamName: teamName.trim()
       });
     }
-
     return out;
+  }
+
+  function applyRanks(data){
+    let rank = 1;
+    let prev = null;
+    let count = 0;
+    data.forEach((p, i) => {
+      count++;
+      if (prev !== null && p.total === prev.total){
+        p.rank = `T-${rank}`;
+      } else {
+        rank = count;
+        p.rank = `#${rank}`;
+      }
+      prev = p;
+    });
   }
 
   async function init(){
     try{
-      let data = await loadData();
+      const data = await loadData();
 
-      data.sort((a, b) => {
-        if (b.total !== a.total) return b.total - a.total;
-        return a.player.localeCompare(b.player);
-      });
+      // Sort by descending goals
+      data.sort((a,b) => b.total - a.total || a.player.localeCompare(b.player));
 
-      // Apply ranks (tie-aware)
-      let currentRank = 1;
-      let lastScore = null;
-      let leaderboardPosition = 1;
+      // Remove zero scores
+      const filtered = data.filter(p => p.total > 0);
 
-      data.forEach(row => {
-        if (row.total !== lastScore) currentRank = leaderboardPosition;
-        row.rank = currentRank;
-        lastScore = row.total;
-        leaderboardPosition++;
-      });
+      applyRanks(filtered);
 
-      render(data);
+      render(filtered);
 
     }catch(err){
       console.error(err);
       render([]);
       const msg = document.createElement('div');
       msg.className = 'hint';
-      msg.textContent = 'Could not load data from the published sheet.';
+      msg.textContent = 'Could not load data.';
       document.querySelector('.wrap').appendChild(msg);
     }
   }
 
   init();
 
+  // Resize fix
   function reFitAll(){
     document.querySelectorAll('.player-big').forEach(el => fitText(el));
-    document.querySelectorAll('.team').forEach(el =>
+    document.querySelectorAll('.title-stack .team').forEach(el => 
       fitText(el, { max:14, min:10, step:0.5, pad:10 })
     );
   }
-
   window.addEventListener('resize', () => {
     clearTimeout(window.__rt);
     window.__rt = setTimeout(reFitAll, 120);
   });
 
+  // Controls
   document.getElementById('revealAll').onclick =
     () => document.querySelectorAll('.card').forEach(c => c.classList.add('revealed'));
 
@@ -436,6 +459,7 @@
       document.getElementById('hideAll').click();
     }
   });
+
 </script>
 </body>
 </html>
