@@ -227,20 +227,29 @@
     return out;
   }
 
-  async function init(){
-    try{
-      const data = await loadData();
-      render(data);
-    }catch(err){
-      console.error(err);
-      render([]);
-      const msg = document.createElement('div');
-      msg.className = 'hint';
-      msg.textContent = 'Could not load data from the published sheet.';
-      document.querySelector('.wrap').appendChild(msg);
-    }
+async function init(){
+  try{
+    const data = await loadData();
+
+    // Sort by goals scored, highest to lowest
+    data.sort((a, b) => {
+      // Primary sort: total goals, descending
+      if (b.total !== a.total) return b.total - a.total;
+      // Secondary sort (optional): player name A–Z for ties
+      return a.player.localeCompare(b.player);
+    });
+
+    render(data);
+  }catch(err){
+    console.error(err);
+    render([]);
+    const msg = document.createElement('div');
+    msg.className = 'hint';
+    msg.textContent = 'Could not load data from the published sheet.';
+    document.querySelector('.wrap').appendChild(msg);
   }
-  init();
+}
+
 
   function reFitAll(){
     document.querySelectorAll('.player-big').forEach(el => fitText(el));
