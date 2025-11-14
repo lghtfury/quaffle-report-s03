@@ -92,6 +92,7 @@
     box-shadow:var(--shadow);
   }
   .card.revealed .flip{transform:rotateY(180deg);}
+
   .face{
     position:absolute;
     inset:0;
@@ -100,18 +101,30 @@
     overflow:hidden;
     border:1px solid var(--line);
   }
+
+  /* FULL BACK IMAGE */
   .back{
-    display:grid;
-    place-items:center;
-    background:linear-gradient(180deg,#141414,#0e0e0e);
-    position:relative;
+    background-image:url("assets/lightning.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding-top:12px;
   }
-  .back img{
-    width:66%;
-    max-width:140px;
-    opacity:.95;
-    filter:drop-shadow(0 10px 30px rgba(214,179,106,.25));
+
+  .rank-pill{
+    background:rgba(214,179,106,0.15);
+    border:1px solid var(--gold);
+    color:var(--gold);
+    padding:6px 12px;
+    font-size:14px;
+    border-radius:20px;
+    font-weight:700;
+    backdrop-filter:blur(4px);
   }
+
   .front{
     transform:rotateY(180deg);
     background:linear-gradient(180deg,#121212,#0b0b0b);
@@ -200,22 +213,6 @@
     background:rgba(214,179,106,.08);
     box-shadow:inset 0 0 24px rgba(214,179,106,.08);
   }
-
-  .rank-pill{
-    position:absolute;
-    top:10px;
-    left:50%;
-    transform:translateX(-50%);
-    padding:6px 12px;
-    border-radius:999px;
-    border:1px solid var(--gold);
-    background:rgba(0,0,0,.8);
-    color:var(--gold);
-    font-weight:800;
-    font-size:14px;
-    letter-spacing:.5px;
-    text-transform:uppercase;
-  }
 </style>
 </head>
 <body>
@@ -237,11 +234,9 @@
 </div>
 
 <script>
-  /* CSV export of your Publish to web link for WorldCup_Chaser */
   const CSV_URL =
     'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=684964704&single=true&output=csv';
 
-  /* Logos */
   const LOGO_BASE = 'assets/';
   const LOGO_MAP = {
     RVN:'knockturn_ravens.png',
@@ -259,7 +254,6 @@
     MISSING:'missing_logo.png'
   };
 
-  /* Team name to tag mapping (case-insensitive) */
   const TEAM_TAGS = {
     'crazy comms':'CC',
     'azkabangers':'BNG',
@@ -278,16 +272,12 @@
 
   function tagFor(teamName){
     if (!teamName) return 'MISSING';
-    const key = String(teamName).trim().toLowerCase();
-    return TEAM_TAGS[key] || 'MISSING';
+    return TEAM_TAGS[teamName.trim().toLowerCase()] || 'MISSING';
   }
-  const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
-  /* Short display names for long teams */
-  const SHORT_NAME = (name) => {
-    if (!name) return '';
+  const SHORT_NAME = name => {
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
-    if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
+    if (/^Obscurus Quidditch Club$/i.test(name)) return 'Obscurus Q.C.';
     return name;
   };
 
@@ -301,7 +291,8 @@
     el.style.whiteSpace = 'nowrap';
     el.style.fontSize = size + 'px';
     let guard = 0;
-    while (el.scrollWidth > (parent.clientWidth - settings.pad) && size > settings.min && guard < 100){
+    while (el.scrollWidth > (parent.clientWidth - settings.pad) &&
+           size > settings.min && guard < 100){
       size -= settings.step;
       el.style.fontSize = size + 'px';
       guard++;
@@ -311,13 +302,14 @@
   function makeCard(row){
     const wrap = document.createElement('div');
     wrap.className = 'card';
-    const niceTeam = SHORT_NAME(row.teamName || row.teamTag);
+    const niceTeam = SHORT_NAME(row.teamName);
+
     wrap.innerHTML = `
       <div class="flip">
         <div class="face back">
           <div class="rank-pill">Rank #${row.rank}</div>
-          <img alt="L7 logo" src="assets/L7_logo_small.png">
         </div>
+
         <div class="face front">
           <div class="top">
             <img class="team-logo" alt="${row.teamTag}">
@@ -337,13 +329,13 @@
           </div>
         </div>
       </div>`;
-    wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
+
+    wrap.querySelector('.team-logo').src = LOGO_BASE + (LOGO_MAP[row.teamTag] || LOGO_MAP.MISSING);
     wrap.addEventListener('click', () => wrap.classList.toggle('revealed'));
+
     fitText(wrap.querySelector('.player-big'));
-    fitText(
-      wrap.querySelector('.title-stack .team'),
-      { max:14, min:10, step:0.5, pad:10 }
-    );
+    fitText(wrap.querySelector('.team'), { max:14, min:10, step:0.5, pad:10 });
+
     return wrap;
   }
 
@@ -353,80 +345,62 @@
   }
 
   function parseCSV(text){
-    const lines = text.trim().split(/\r?\n/);
-    return lines.map(line => line.split(','));
+    return text.trim().split(/\r?\n/).map(line => line.split(','));
   }
 
   async function loadData(){
-    const res = await fetch(CSV_URL, { cache: 'no-store' });
+    const res = await fetch(CSV_URL, { cache:'no-store' });
     const text = await res.text();
     const rows = parseCSV(text);
 
     const out = [];
-    for (let i = 1; i < rows.length; i++){ // skip header
+
+    for (let i = 1; i < rows.length; i++){
       const row = rows[i];
-      if (!row || !row.length) continue;
+      if (!row || row.length < 3) continue;
 
       const teamName = row[0];
       const player = row[1];
-      const goals = row[2];
+      const total = parseFloat(row[2]);
 
       if (!teamName || !player) continue;
-
-      const total = parseFloat(goals);
       if (!Number.isFinite(total)) continue;
+      if (total <= 0) continue; // Hide 0-goal players
 
       out.push({
-        player: String(player).trim(),
+        player: player.trim(),
         total,
         teamTag: tagFor(teamName),
-        teamName: String(teamName).trim()
+        teamName: teamName.trim()
       });
     }
+
     return out;
-  }
-
-  // Add ranks with tie logic:
-  // same goals = same rank, next rank increments by 1
-  function addRanks(players){
-    if (!players.length) return players;
-    let rank = 1;
-    let prevTotal = players[0].total;
-    players[0].rank = 1;
-
-    for (let i = 1; i < players.length; i++){
-      if (players[i].total === prevTotal){
-        players[i].rank = rank;
-      } else {
-        rank++;
-        players[i].rank = rank;
-        prevTotal = players[i].total;
-      }
-    }
-    return players;
   }
 
   async function init(){
     try{
-      const data = await loadData();
+      let data = await loadData();
 
-      // Sort by goals scored, highest to lowest
       data.sort((a, b) => {
-        if (b.total !== a.total) return b.total - a.total; // goals desc
-        return a.player.localeCompare(b.player);           // tie breaker
+        if (b.total !== a.total) return b.total - a.total;
+        return a.player.localeCompare(b.player);
       });
 
-      // Remove players with 0 goals
-      const filtered = data.filter(p => p.total > 0);
+      // Apply ranks (tie-aware)
+      let currentRank = 1;
+      let lastScore = null;
+      let leaderboardPosition = 1;
 
-      // Optional: limit to top N
-      // const TOP_N = 20;
-      // const sliced = filtered.slice(0, TOP_N);
-      // const ranked = addRanks(sliced);
+      data.forEach(row => {
+        if (row.total !== lastScore) currentRank = leaderboardPosition;
+        row.rank = currentRank;
+        lastScore = row.total;
+        leaderboardPosition++;
+      });
 
-      const ranked = addRanks(filtered);
+      render(data);
 
-      render(ranked);
     }catch(err){
       console.error(err);
       render([]);
@@ -441,10 +415,11 @@
 
   function reFitAll(){
     document.querySelectorAll('.player-big').forEach(el => fitText(el));
-    document.querySelectorAll('.title-stack .team').forEach(el =>
+    document.querySelectorAll('.team').forEach(el =>
       fitText(el, { max:14, min:10, step:0.5, pad:10 })
     );
   }
+
   window.addEventListener('resize', () => {
     clearTimeout(window.__rt);
     window.__rt = setTimeout(reFitAll, 120);
