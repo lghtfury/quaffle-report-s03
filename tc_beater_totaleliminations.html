@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Triwizard Cup Beaters - Total Eliminations</title>
+<title>Triwizard Beaters - Seeker Eliminations</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -219,8 +219,8 @@
 <body>
 <header>
   <div>
-    <h1 id="title">Total Eliminations</h1>
-    <div class="sub" id="subtitle">Triwizard Cup Beater leaderboard. Click a card to reveal. Press R to reset.</div>
+    <h1 id="title">Seeker Eliminations</h1>
+    <div class="sub" id="subtitle">Triwizard Beater leaderboard. Click a card to reveal. Press R to reset.</div>
   </div>
   <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
 </header>
@@ -326,7 +326,7 @@
           </div>
 
           <div class="bottom">
-            <span class="label">Total Elims</span>
+            <span class="label">Seeker Elims</span>
             <span class="num">${row.total}</span>
           </div>
         </div>
@@ -361,13 +361,14 @@
       const row = rows[i];
       if (!row || !row.length) continue;
 
-      const teamName = row[0];  // A
-      const player   = row[1];  // B
-      const totalElims = row[9]; // J = TotalEliminations (Triwizard)
+      // Triwizard_Beater lives in columns G–J
+      const teamName = row[6]; // G
+      const player   = row[7]; // H
+      const seekerElims = row[8]; // I = SeekerEliminations
 
       if (!teamName || !player) continue;
 
-      const total = parseFloat(totalElims);
+      const total = parseFloat(seekerElims);
       if (!Number.isFinite(total) || total <= 0) continue;
 
       out.push({
@@ -396,7 +397,7 @@
       const data = await loadData();
 
       data.sort((a, b) => {
-        if (b.total !== a.total) return b.total - a.total;
+        if (b.total !== a.total) return b.total - a.total; // desc by elims
         return a.player.localeCompare(b.player);
       });
 
