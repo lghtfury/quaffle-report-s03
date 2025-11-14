@@ -111,20 +111,20 @@
     opacity:.95;
     filter:drop-shadow(0 10px 30px rgba(214,179,106,.25));
   }
-  /* NEW: rank label at bottom of back */
+  /* Rank bar across full width at bottom */
   .rank-bottom{
     position:absolute;
-    bottom:14px;
-    left:50%;
-    transform:translateX(-50%);
+    left:0;
+    right:0;
+    bottom:0;
+    padding:6px 0;
+    text-align:center;
     font-size:16px;
     font-weight:700;
     color:var(--gold);
+    background:rgba(0,0,0,.55);
+    border-top:1px solid var(--gold);
     text-shadow:0 0 6px rgba(0,0,0,.6);
-    background:rgba(0,0,0,.45);
-    padding:4px 12px;
-    border-radius:14px;
-    border:1px solid var(--gold);
   }
 
   .front{
@@ -287,8 +287,7 @@
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
     if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
-    if (/^Crazy Comms$/i.test(name))                 return 'Wholesome Comms';
-    return name;
+    return name; // Crazy Comms stays Crazy Comms
   };
 
   const grid = document.getElementById('grid');
@@ -374,7 +373,8 @@
       if (!teamName || !player) continue;
 
       const total = parseFloat(goals);
-      if (!Number.isFinite(total)) continue;
+      // ignore non-numeric or zero/negative
+      if (!Number.isFinite(total) || total <= 0) continue;
 
       out.push({
         player: String(player).trim(),
@@ -408,9 +408,19 @@
         return a.player.localeCompare(b.player);           // tie breaker
       });
 
-      // assign simple 1st/2nd/... ranking based on sorted order
+      // Dense ranking with ties:
+      // same goals -> same rank; next distinct goals -> next rank number
+      let currentRank = 0;
+      let prevTotal = null;
       data.forEach((row, idx) => {
-        row.rankLabel = `${ordinal(idx + 1)} place`;
+        if (prevTotal === null){
+          currentRank = 1;
+        } else if (row.total !== prevTotal){
+          currentRank += 1;
+        }
+        row.rankNumber = currentRank;
+        row.rankLabel = `${ordinal(currentRank)} place`;
+        prevTotal = row.total;
       });
 
       render(data);
