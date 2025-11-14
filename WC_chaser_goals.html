@@ -345,24 +345,14 @@
     const text = await res.text();
     const rows = parseCSV(text);
 
-    if (rows.length < 2) return [];
-
-    const header = rows[0].map(h => h.trim().toLowerCase());
-
-    // Find columns by header names (robust even if you reorder columns)
-    const idxTeam = header.findIndex(h => h === 'team' || h.includes('team'));
-    const idxPlayer = header.findIndex(h => h.includes('playername'));
-    const idxGoals = header.findIndex(h => h.includes('goalscored'));
-
     const out = [];
-
-    for (let i = 1; i < rows.length; i++){
+    for (let i = 1; i < rows.length; i++){ // skip header
       const row = rows[i];
-      if (!row || row.length === 0) continue;
+      if (!row || !row.length) continue;
 
-      const teamName = row[idxTeam];
-      const player   = row[idxPlayer];
-      const goals    = row[idxGoals];
+      const teamName = row[0];
+      const player = row[1];
+      const goals = row[2];
 
       if (!teamName || !player) continue;
 
@@ -376,7 +366,6 @@
         teamName: String(teamName).trim()
       });
     }
-
     return out;
   }
 
