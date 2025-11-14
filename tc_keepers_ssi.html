@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Triwizard Cup Beaters - Seeker Eliminations</title>
+<title>Triwizard Cup Keepers - SSI </title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -219,8 +219,8 @@
 <body>
 <header>
   <div>
-    <h1 id="title">Seeker Eliminations</h1>
-    <div class="sub" id="subtitle">Triwizard Cup Beater leaderboard. Click a card to reveal. Press R to reset.</div>
+    <h1 id="title">Keeper SSI</h1>
+    <div class="sub" id="subtitle">Triwizard Cup Keeper SSI leaderboard. Click a card to reveal. Press R to reset.</div>
   </div>
   <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
 </header>
@@ -329,7 +329,7 @@
           </div>
 
           <div class="bottom">
-            <span class="label">Seeker Elims</span>
+            <span class="label">SSI</span>
             <span class="num">${row.total}</span>
           </div>
         </div>
@@ -370,7 +370,7 @@
 
       if (!teamName || !player) continue;
 
-      const total = parseFloat(elims);
+      const total = parseFloat(ssi);
       if (!Number.isFinite(total) || total <= 0) continue;
 
       out.push({
