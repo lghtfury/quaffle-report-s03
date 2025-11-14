@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>World Cup Chasers - Goals Scored</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
 <style>
   :root{
     --bg:#0b0b0c; --panel:#101010; --text:#f2f2f2; --muted:#bdbdbd;
@@ -61,8 +60,6 @@
     background:rgba(214,179,106,.08);
     border-color:rgba(214,179,106,.45);
   }
-
-  /* GRID */
   .grid{
     display:grid;
     grid-template-columns:repeat(6,1fr);
@@ -77,7 +74,6 @@
   @media (max-width:560px){
     .grid{grid-template-columns:repeat(2,1fr);}
   }
-
   .hint{
     font-size:12px;
     color:var(--muted);
@@ -85,7 +81,6 @@
     margin-top:18px;
   }
 
-  /* CARD */
   .card{perspective:1200px;}
   .flip{
     position:relative;
@@ -106,41 +101,34 @@
     border:1px solid var(--line);
   }
 
-  /* BACK FACE — now full-size */
   .back{
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    display:grid;
+    place-items:center;
     background:linear-gradient(180deg,#141414,#0e0e0e);
     position:relative;
   }
-
   .back img{
-    width:100%;
-    height:100%;
-    object-fit:contain;    /* FULL SIZE but proportional */
-    padding:20px;
+    width:66%;
+    max-width:140px;
     opacity:.95;
     filter:drop-shadow(0 10px 30px rgba(214,179,106,.25));
   }
 
-  /* Rank badge */
+  /* Rank on back of card */
   .rank-pill{
     position:absolute;
-    top:12px;
+    top:10px;
     left:50%;
     transform:translateX(-50%);
-    background:rgba(214,179,106,.18);
-    border:1px solid var(--gold);
-    padding:4px 10px;
-    border-radius:40px;
     font-size:12px;
     font-weight:700;
     color:var(--gold);
-    backdrop-filter:blur(4px);
+    background:rgba(0,0,0,.6);
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid var(--gold);
   }
 
-  /* FRONT */
   .front{
     transform:rotateY(180deg);
     background:linear-gradient(180deg,#121212,#0b0b0b);
@@ -170,6 +158,7 @@
   .team{
     color:var(--muted);
     font-size:12px;
+    line-height:1;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -180,16 +169,20 @@
     inset:44px 0 52px;
     display:grid;
     place-items:center;
-    text-align:center;
+    background:
+      radial-gradient(140px 70px at 50% 15%, rgba(212,175,55,.08), transparent 70%),
+      radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
     padding:0 10px;
+    text-align:center;
   }
-
   .player-big{
     display:inline-block;
     padding:10px 18px;
     border-radius:10px;
     background:rgba(0,0,0,.35);
     font-weight:900;
+    line-height:1.05;
+    letter-spacing:.2px;
     color:#fff;
     white-space:nowrap;
     overflow:hidden;
@@ -200,7 +193,6 @@
     max-width:92%;
     font-size:clamp(20px, 3.8vw, 36px);
   }
-
   .bottom{
     margin-top:auto;
     display:flex;
@@ -218,6 +210,7 @@
   .num{
     font-weight:800;
     font-size:28px;
+    line-height:1;
     border:2px solid var(--gold);
     padding:6px 12px;
     border-radius:12px;
@@ -226,7 +219,6 @@
   }
 </style>
 </head>
-
 <body>
 <header>
   <div>
@@ -246,11 +238,11 @@
 </div>
 
 <script>
-  /* CSV URL */
+  /* CSV export of your Publish to web link for WorldCup_Chaser */
   const CSV_URL =
     'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=684964704&single=true&output=csv';
 
-  /* TEAM LOGOS */
+  /* Logos */
   const LOGO_BASE = 'assets/';
   const LOGO_MAP = {
     RVN:'knockturn_ravens.png',
@@ -268,6 +260,7 @@
     MISSING:'missing_logo.png'
   };
 
+  /* Team name to tag mapping (case-insensitive) */
   const TEAM_TAGS = {
     'crazy comms':'CC',
     'azkabangers':'BNG',
@@ -286,14 +279,17 @@
 
   function tagFor(teamName){
     if (!teamName) return 'MISSING';
-    const key = teamName.trim().toLowerCase();
+    const key = String(teamName).trim().toLowerCase();
     return TEAM_TAGS[key] || 'MISSING';
   }
+  const teamLogo = tag => LOGO_BASE + (LOGO_MAP[tag] || LOGO_MAP.MISSING);
 
+  /* Short display names for long teams */
   const SHORT_NAME = (name) => {
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
     if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
+    // Crazy Comms no longer renamed
     return name;
   };
 
@@ -317,18 +313,13 @@
   function makeCard(row){
     const wrap = document.createElement('div');
     wrap.className = 'card';
-    const niceTeam = SHORT_NAME(row.teamName);
-
+    const niceTeam = SHORT_NAME(row.teamName || row.teamTag);
     wrap.innerHTML = `
       <div class="flip">
-
-        <!-- BACK -->
         <div class="face back">
-          <span class="rank-pill">${row.rank}</span>
-          <img src="assets/lightning.png" alt="Lightning">
+          <span class="rank-pill">#${row.rank}</span>
+          <img alt="L7 logo" src="assets/L7_logo_small.png">
         </div>
-
-        <!-- FRONT -->
         <div class="face front">
           <div class="top">
             <img class="team-logo" alt="${row.teamTag}">
@@ -347,15 +338,14 @@
             <span class="num">${row.total}</span>
           </div>
         </div>
-      </div>
-    `;
-
-    wrap.querySelector('.team-logo').src = LOGO_BASE + (LOGO_MAP[row.teamTag] || LOGO_MAP.MISSING);
+      </div>`;
+    wrap.querySelector('.team-logo').src = teamLogo(row.teamTag);
     wrap.addEventListener('click', () => wrap.classList.toggle('revealed'));
-
     fitText(wrap.querySelector('.player-big'));
-    fitText(wrap.querySelector('.title-stack .team'), { max:14, min:10, step:0.5, pad:10 });
-
+    fitText(
+      wrap.querySelector('.title-stack .team'),
+      { max:14, min:10, step:0.5, pad:10 }
+    );
     return wrap;
   }
 
@@ -365,80 +355,70 @@
   }
 
   function parseCSV(text){
-    return text.trim().split(/\r?\n/).map(line => line.split(','));
+    const lines = text.trim().split(/\r?\n/);
+    return lines.map(line => line.split(','));
   }
 
   async function loadData(){
-    const res = await fetch(CSV_URL, { cache:'no-store' });
+    const res = await fetch(CSV_URL, { cache: 'no-store' });
     const text = await res.text();
     const rows = parseCSV(text);
 
     const out = [];
-
-    for (let i = 1; i < rows.length; i++){
+    for (let i = 1; i < rows.length; i++){ // skip header
       const row = rows[i];
+      if (!row || !row.length) continue;
+
       const teamName = row[0];
       const player = row[1];
-      const goals = parseFloat(row[2]);
+      const goals = row[2];
 
-      if (!teamName || !player || !Number.isFinite(goals)) continue;
+      if (!teamName || !player) continue;
+
+      const total = parseFloat(goals);
+      if (!Number.isFinite(total)) continue;
 
       out.push({
-        player: player.trim(),
-        total: goals,
+        player: String(player).trim(),
+        total,
         teamTag: tagFor(teamName),
-        teamName: teamName.trim()
+        teamName: String(teamName).trim()
       });
     }
     return out;
-  }
-
-  function applyRanks(data){
-    let rank = 1;
-    let prev = null;
-    let count = 0;
-    data.forEach((p, i) => {
-      count++;
-      if (prev !== null && p.total === prev.total){
-        p.rank = `T-${rank}`;
-      } else {
-        rank = count;
-        p.rank = `#${rank}`;
-      }
-      prev = p;
-    });
   }
 
   async function init(){
     try{
       const data = await loadData();
 
-      // Sort by descending goals
-      data.sort((a,b) => b.total - a.total || a.player.localeCompare(b.player));
+      // Sort by goals scored, highest to lowest
+      data.sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total; // goals desc
+        return a.player.localeCompare(b.player);           // tie breaker
+      });
 
-      // Remove zero scores
-      const filtered = data.filter(p => p.total > 0);
+      // Simple positional rank based on sorted order
+      data.forEach((row, index) => {
+        row.rank = index + 1;
+      });
 
-      applyRanks(filtered);
-
-      render(filtered);
-
+      render(data);
     }catch(err){
       console.error(err);
       render([]);
       const msg = document.createElement('div');
       msg.className = 'hint';
-      msg.textContent = 'Could not load data.';
+      msg.textContent = 'Could not load data from the published sheet.';
       document.querySelector('.wrap').appendChild(msg);
     }
   }
 
   init();
 
-  // Resize fix
   function reFitAll(){
     document.querySelectorAll('.player-big').forEach(el => fitText(el));
-    document.querySelectorAll('.title-stack .team').forEach(el => 
+    document.querySelectorAll('.title-stack .team').forEach(el =>
       fitText(el, { max:14, min:10, step:0.5, pad:10 })
     );
   }
@@ -447,7 +427,6 @@
     window.__rt = setTimeout(reFitAll, 120);
   });
 
-  // Controls
   document.getElementById('revealAll').onclick =
     () => document.querySelectorAll('.card').forEach(c => c.classList.add('revealed'));
 
@@ -459,7 +438,6 @@
       document.getElementById('hideAll').click();
     }
   });
-
 </script>
 </body>
 </html>
