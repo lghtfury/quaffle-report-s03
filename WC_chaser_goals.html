@@ -100,12 +100,10 @@
     overflow:hidden;
     border:1px solid var(--line);
   }
-
   .back{
     display:grid;
     place-items:center;
     background:linear-gradient(180deg,#141414,#0e0e0e);
-    position:relative;
   }
   .back img{
     width:66%;
@@ -113,22 +111,6 @@
     opacity:.95;
     filter:drop-shadow(0 10px 30px rgba(214,179,106,.25));
   }
-
-  /* Rank on back of card */
-  .rank-pill{
-    position:absolute;
-    top:10px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:12px;
-    font-weight:700;
-    color:var(--gold);
-    background:rgba(0,0,0,.6);
-    padding:4px 10px;
-    border-radius:999px;
-    border:1px solid var(--gold);
-  }
-
   .front{
     transform:rotateY(180deg);
     background:linear-gradient(180deg,#121212,#0b0b0b);
@@ -289,7 +271,7 @@
     if (!name) return '';
     if (/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
     if (/^Obscurus Quidditch Club$/i.test(name))     return 'Obscurus Q.C.';
-    // Crazy Comms no longer renamed
+    if (/^Crazy Comms$/i.test(name))                 return 'Wholesome Comms';
     return name;
   };
 
@@ -317,7 +299,6 @@
     wrap.innerHTML = `
       <div class="flip">
         <div class="face back">
-          <span class="rank-pill">#${row.rank}</span>
           <img alt="L7 logo" src="assets/L7_logo_small.png">
         </div>
         <div class="face front">
@@ -396,11 +377,6 @@
       data.sort((a, b) => {
         if (b.total !== a.total) return b.total - a.total; // goals desc
         return a.player.localeCompare(b.player);           // tie breaker
-      });
-
-      // Simple positional rank based on sorted order
-      data.forEach((row, index) => {
-        row.rank = index + 1;
       });
 
       render(data);
