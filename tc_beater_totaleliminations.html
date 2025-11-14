@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Triwizard Beaters - Seeker Eliminations</title>
+<title>Triwizard Beaters - Total Eliminations</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -219,7 +219,7 @@
 <body>
 <header>
   <div>
-    <h1 id="title">Seeker Eliminations</h1>
+    <h1 id="title">Total Eliminations</h1>
     <div class="sub" id="subtitle">Triwizard Beater leaderboard. Click a card to reveal. Press R to reset.</div>
   </div>
   <img src="assets/L7_logo_small.png" alt="L7" style="height:36px;opacity:.9">
@@ -326,7 +326,7 @@
           </div>
 
           <div class="bottom">
-            <span class="label">Seeker Elims</span>
+            <span class="label">Total Elims</span>
             <span class="num">${row.total}</span>
           </div>
         </div>
@@ -364,11 +364,11 @@
       // Triwizard_Beater lives in columns G–J
       const teamName = row[6]; // G
       const player   = row[7]; // H
-      const seekerElims = row[8]; // I = SeekerEliminations
+      const totalElims = row[9]; // J = TotalEliminations
 
       if (!teamName || !player) continue;
 
-      const total = parseFloat(seekerElims);
+      const total = parseFloat(totalElims);
       if (!Number.isFinite(total) || total <= 0) continue;
 
       out.push({
