@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Triwizard Cup Seekers - Snitches Caught</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#00070a;
+    --panel:#0a0e10;
+    --text:#f2f2f2;
+    --muted:#9fb3c0;
+    --gold:#69d0ff;
+    --line:rgba(105,208,255,.28);
+    --shadow:0 18px 58px rgba(0,0,0,.55);
+    --r:18px;
+  }
+  html,body{
+    height:100%; margin:0;
+    background:
+      radial-gradient(1200px 500px at 50% -10%,rgba(105,208,255,.08),transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  }
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(0,20,30,.65),rgba(0,20,30,.25));
+  }
+  h1{font-size:clamp(22px,3.2vw,40px); margin:0;}
+  .sub{color:var(--muted); font-size:13px;}
+
+  .wrap{max-width:1300px; margin:26px auto; padding:0 16px;}
+
+  .controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+  .btn{
+    padding:8px 12px; border:1px solid var(--line);
+    background:#0f171c; border-radius:12px; color:var(--text); cursor:pointer;
+  }
+  .btn.gold{
+    background:rgba(105,208,255,.08);
+    border-color:rgba(105,208,255,.45);
+  }
+
+  .grid{
+    display:grid; grid-template-columns:repeat(6,1fr); gap:16px;
+  }
+  @media (max-width:1200px){.grid{grid-template-columns:repeat(4,1fr);}}
+  @media (max-width:820px){.grid{grid-template-columns:repeat(3,1fr);}}
+  @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr);}}
+
+  .hint{text-align:center; margin-top:18px; color:var(--muted); font-size:12px;}
+
+  /* Flip cards */
+  .card{perspective:1200px;}
+  .flip{
+    position:relative; width:100%; padding-top:140%;
+    transform-style:preserve-3d;
+    transition:transform .7s cubic-bezier(.2,.9,.2,1);
+    border-radius:var(--r); box-shadow:var(--shadow);
+  }
+  .card.revealed .flip{transform:rotateY(180deg);}
+  .face{
+    position:absolute; inset:0; border-radius:var(--r);
+    backface-visibility:hidden; overflow:hidden; border:1px solid var(--line);
+  }
+
+  .back{
+    display:grid; place-items:center;
+    background:linear-gradient(180deg,#0e161b,#020608);
+  }
+  .back img{
+    width:66%; max-width:140px; opacity:.9;
+    filter:drop-shadow(0 10px 30px rgba(105,208,255,.25));
+  }
+  .rank-bottom{
+    position:absolute; bottom:0; left:0; right:0;
+    padding:6px 0; background:rgba(0,0,0,.55);
+    color:var(--gold); text-align:center; font-weight:700; font-size:16px;
+    border-top:1px solid var(--gold);
+  }
+
+  .front{
+    transform:rotateY(180deg);
+    background:linear-gradient(180deg,#10171b,#05090c);
+    display:flex; flex-direction:column;
+  }
+  .top{
+    display:grid; grid-template-columns:34px 1fr 34px;
+    align-items:center; padding:12px 12px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(105,208,255,.12),transparent);
+  }
+  .team-logo{
+    width:34px; height:34px; border-radius:10px; object-fit:cover; background:#111;
+  }
+  .team{color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  .body{
+    position:absolute; inset:44px 0 52px;
+    display:grid; place-items:center;
+    background:
+      radial-gradient(140px 70px at 50% 15%, rgba(105,208,255,.08), transparent 70%),
+      radial-gradient(180px 110px at 50% 110%, rgba(0,0,0,.35), transparent 70%);
+  }
+  .player-big{
+    background:rgba(0,0,0,.35); padding:10px 18px;
+    border-radius:10px; font-weight:900; color:white;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow:0 0 0 1px rgba(105,208,255,.15) inset, 0 6px 16px rgba(0,0,0,.35);
+    max-width:92%; font-size:clamp(20px, 3.8vw, 36px);
+  }
+
+  .bottom{
+    margin-top:auto; padding:10px 12px;
+    background:linear-gradient(180deg,rgba(105,208,255,.12),rgba(105,208,255,.06));
+    border-top:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .label{font-size:12px; color:var(--muted); margin-right:8px;}
+  .num{
+    font-size:28px; font-weight:800; padding:6px 12px;
+    border-radius:12px; border:2px solid var(--gold);
+    background:rgba(105,208,255,.08);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Snitches Caught</h1>
+    <div class="sub">Triwizard Cup Seeker leaderboard. Click a card to reveal. Press R to reset.</div>
+  </div>
+  <img src="assets/L7_logo_small.png" style="height:36px;opacity:.9">
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <button class="btn gold" id="revealAll">Reveal All</button>
+    <button class="btn" id="hideAll">Hide All</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="hint">If a logo is wrong, update <code>TEAM_TAGS</code>.</div>
+</div>
+
+<script>
+  const CSV_URL =
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0wIGsVcI7-s-Yk8J8HjuKRCIBE7Y4IICrofwISq_uRQuvqxg2_eEowuhM7QU-iURYyaO0R1_Z0Pc7/pub?gid=865863104&single=true&output=csv';
+
+  const LOGO_BASE='assets/';
+  const LOGO_MAP={
+    RVN:'knockturn_ravens.png',
+    HAG:'wildcard_hagrids.png',
+    HOG:'hellfire_hogs.png',
+    OWL:'oakshaft_owls.png',
+    OP:'the_order_of_the_phoenoobz.png',
+    CC:'crazy_comms.png',
+    TI:'thin_ice.png',
+    DQC:'dumbledorks_quidditch_club.png',
+    BD:'bad_dwagons.png',
+    NHK:'nimbus_nighthawks.png',
+    BNG:'azkabangers.png',
+    OBS:'obscurus_quidditch_club.png',
+    MISSING:'missing_logo.png'
+  };
+
+  const TEAM_TAGS={
+    'crazy comms':'CC',
+    'azkabangers':'BNG',
+    'nimbus nighthawks':'NHK',
+    'thin ice':'TI',
+    'bad dwagons':'BD',
+    'dumbledorks quidditch club':'DQC',
+    'obscurus quidditch club':'OBS',
+    'knockturn ravens':'RVN',
+    'wildcard hagrids':'HAG',
+    'hellfire hogs':'HOG',
+    'oakshaft owls':'OWL',
+    'order of the phoenoobz':'OP',
+    'the order of the phoenoobz':'OP'
+  };
+
+  function tagFor(name){
+    if(!name) return 'MISSING';
+    return TEAM_TAGS[String(name).trim().toLowerCase()] || 'MISSING';
+  }
+
+  const SHORT_NAME=name=>{
+    if(!name) return '';
+    if(/^Dumbledorks Quidditch Club$/i.test(name)) return 'Dumbledorks Q.C.';
+    if(/^Obscurus Quidditch Club$/i.test(name)) return 'Obscurus Q.C.';
+    return name;
+  };
+
+  function parseCSV(t){return t.trim().split(/\r?\n/).map(l=>l.split(','));}
+
+  async function loadData(){
+    const res=await fetch(CSV_URL,{cache:'no-store'});
+    const txt=await res.text();
+    const rows=parseCSV(txt);
+
+    const out=[];
+    for(let i=1;i<rows.length;i++){
+      const r=rows[i];
+      if(!r) continue;
+
+      const team=r[0];
+      const player=r[1];
+      const caught=r[2]; // Column H for Triwizard
+
+      if(!team || !player) continue;
+
+      const total=parseFloat(caught);
+      if(!Number.isFinite(total) || total<=0) continue;
+
+      out.push({
+        player:player.trim(),
+        total,
+        teamName:team.trim(),
+        teamTag:tagFor(team)
+      });
+    }
+    return out;
+  }
+
+  const grid=document.getElementById('grid');
+
+  function fitText(el,opt){
+    const s=Object.assign({max:38,min:12,step:.5,pad:28},opt||{});
+    if(!el) return;
+    const p=el.parentElement;
+    let size=s.max;
+    el.style.fontSize=size+'px';
+    el.style.whiteSpace='nowrap';
+    let guard=0;
+    while(el.scrollWidth>(p.clientWidth-s.pad) && size>s.min && guard<100){
+      size-=s.step; el.style.fontSize=size+'px'; guard++;
+    }
+  }
+
+  function makeCard(row){
+    const w=document.createElement('div');
+    w.className='card';
+    const niceTeam=SHORT_NAME(row.teamName);
+
+    w.innerHTML=`
+      <div class="flip">
+        <div class="face back">
+          <img src="assets/L7_logo_small.png">
+          <div class="rank-bottom">${row.rankLabel}</div>
+        </div>
+
+        <div class="face front">
+          <div class="top">
+            <img class="team-logo">
+            <div class="title-stack">
+              <div class="team">${niceTeam}</div>
+            </div>
+            <div></div>
+          </div>
+
+          <div class="body">
+            <div class="player-big">${row.player}</div>
+          </div>
+
+          <div class="bottom">
+            <span class="label">Snitches</span>
+            <span class="num">${row.total}</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    w.querySelector('.team-logo').src =
+      LOGO_BASE + (LOGO_MAP[row.teamTag] || LOGO_MAP.MISSING);
+
+    w.addEventListener('click',()=>w.classList.toggle('revealed'));
+
+    fitText(w.querySelector('.player-big'));
+    fitText(w.querySelector('.team'),{max:14,min:10,step:.5,pad:10});
+    return w;
+  }
+
+  function render(rows){
+    grid.innerHTML='';
+    rows.forEach(r=>grid.appendChild(makeCard(r)));
+  }
+
+  async function init(){
+    const data=await loadData();
+    data.sort((a,b)=>b.total-a.total || a.player.localeCompare(b.player));
+
+    let prev=null,rank=0;
+    data.forEach(d=>{
+      if(prev===null) rank=1;
+      else if(d.total!==prev) rank++;
+      d.rankLabel=rank+' place';
+      prev=d.total;
+    });
+
+    render(data);
+  }
+
+  init();
+
+  document.getElementById('revealAll').onclick=
+    ()=>document.querySelectorAll('.card').forEach(c=>c.classList.add('revealed'));
+
+  document.getElementById('hideAll').onclick=
+    ()=>document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed'));
+
+  document.addEventListener('keydown',e=>{
+    if(e.key.toLowerCase()==='r')
+      document.getElementById('hideAll').click();
+  });
+</script>
+
+</body>
+</html>
