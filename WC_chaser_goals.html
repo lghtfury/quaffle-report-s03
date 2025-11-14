@@ -111,6 +111,22 @@
     opacity:.95;
     filter:drop-shadow(0 10px 30px rgba(214,179,106,.25));
   }
+  /* NEW: rank label at bottom of back */
+  .rank-bottom{
+    position:absolute;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:16px;
+    font-weight:700;
+    color:var(--gold);
+    text-shadow:0 0 6px rgba(0,0,0,.6);
+    background:rgba(0,0,0,.45);
+    padding:4px 12px;
+    border-radius:14px;
+    border:1px solid var(--gold);
+  }
+
   .front{
     transform:rotateY(180deg);
     background:linear-gradient(180deg,#121212,#0b0b0b);
@@ -300,6 +316,7 @@
       <div class="flip">
         <div class="face back">
           <img alt="L7 logo" src="assets/L7_logo_small.png">
+          <div class="rank-bottom">${row.rankLabel}</div>
         </div>
         <div class="face front">
           <div class="top">
@@ -369,6 +386,18 @@
     return out;
   }
 
+  // helper to turn 1 -> "1st", 2 -> "2nd", etc.
+  function ordinal(n){
+    const v = n % 100;
+    if (v >= 11 && v <= 13) return n + 'th';
+    switch (n % 10){
+      case 1: return n + 'st';
+      case 2: return n + 'nd';
+      case 3: return n + 'rd';
+      default: return n + 'th';
+    }
+  }
+
   async function init(){
     try{
       const data = await loadData();
@@ -377,6 +406,11 @@
       data.sort((a, b) => {
         if (b.total !== a.total) return b.total - a.total; // goals desc
         return a.player.localeCompare(b.player);           // tie breaker
+      });
+
+      // assign simple 1st/2nd/... ranking based on sorted order
+      data.forEach((row, idx) => {
+        row.rankLabel = `${ordinal(idx + 1)} place`;
       });
 
       render(data);
