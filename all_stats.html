@@ -459,10 +459,46 @@
           player: String(player).trim(),
           total,
           teamTag: tagFor(teamName),
-          teamName: String(teamName).trim()
+          teamName: String(teamName).trim(),
+          _single: total   // keep this row's own value for tie-breaking team
         });
       }
     }
+
+    // If this is a player-based stat, merge duplicate players (e.g., Tux across teams)
+    if (config.type === 'player'){
+      const merged = new Map(); // key: player name
+      for (const row of out){
+        const key = row.player;
+        const existing = merged.get(key);
+        if (!existing){
+          // clone so we do not leak _single after merge
+          merged.set(key, {
+            player: row.player,
+            total: row.total,
+            teamTag: row.teamTag,
+            teamName: row.teamName,
+            _bestSingle: row._single
+          });
+        } else {
+          existing.total += row.total;
+          // if this row has a higher single-game/entry value, use this team/logo
+          if (row._single > existing._bestSingle){
+            existing._bestSingle = row._single;
+            existing.teamTag = row.teamTag;
+            existing.teamName = row.teamName;
+          }
+        }
+      }
+      // strip helper field before returning
+      return Array.from(merged.values()).map(r => ({
+        player: r.player,
+        total: r.total,
+        teamTag: r.teamTag,
+        teamName: r.teamName
+      }));
+    }
+
     return out;
   }
 
@@ -597,4 +633,3 @@
 </script>
 </body>
 </html>
-
